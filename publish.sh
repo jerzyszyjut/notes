@@ -52,6 +52,18 @@ for n in "${published[@]}"; do
   dest="$CONTENT/$(site_path "$n")"
   mkdir -p "$(dirname "$dest")"
   cp "$VAULT/$n" "$dest"
+
+  # Attachments linked or embedded as [[file.pdf]] / ![[image.png|300]] go next to the note.
+  grep -oP '!?\[\[\K[^]|#]+\.(?!md\])[A-Za-z0-9]+(?=[]|#])' "$VAULT/$n" | sort -u |
+    while IFS= read -r att; do
+      src=$(find "$VAULT" -path "$VAULT/.obsidian" -prune -o -type f -path "*/$att" -print -quit)
+      [[ -z "$src" ]] && src=$(find "$VAULT" -path "$VAULT/.obsidian" -prune -o -type f -name "$(basename "$att")" -print -quit)
+      if [[ -n "$src" ]]; then
+        cp "$src" "$(dirname "$dest")/" && echo "    + $att"
+      else
+        echo "    ! attachment not found: $att"
+      fi
+    done
 done
 
 cd "$QUARTZ"
