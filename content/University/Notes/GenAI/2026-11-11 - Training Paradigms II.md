@@ -353,4 +353,209 @@ Example: $r$ = 0.8, 0.5, 0.3, 0.1 → mean 0.425, std 0.259 → $A$ = **+1.45, +
 - Baseline: lets bad answers get pushed down; reduces variance; does not change what is optimal.
 - PPO = value model + per-token credit; GRPO = group mean/std, same advantage for all tokens, no value model, KL in the loss.
 
+
+## Test questions for this lecture (14)
+
+> [!info] Same format as the test
+> 0 to 4 options can be correct. Tick, then open the answer. **+1.5 ÷ n** per correct tick, **−0.75** per wrong tick, never below 0; no correct option → no tick = 1.5.
+> The same questions, mixed across lectures and timed, are in the mock tests ([[_GenAI Test 1 - Start Here|Start Here]]) and in the Quiz tab of the [[GenAI Lab]].
+
+### Official Q4 · the KV cache: prefill and decode
+<small>from [[GenAI - Official Example Questions|Official]]</small>
+
+**A model generates text one token at a time, with a standard KV cache. What happens for each new token?**
+
+- [ ] **A** Only the new token goes through all the layers
+- [ ] **B** Its query is compared with the cached keys of all earlier tokens
+- [ ] **C** Its key and value are stored in the cache for later tokens
+- [ ] **D** The keys of earlier tokens are updated to include the new token
+
+> [!success]- Answer: A, B, C
+> Earlier tokens are needed only inside attention, through their keys and values. Because of the mask, a token never sees later tokens, so its key and value never change.
+> *Training Paradigms II · the KV cache: prefill and decode*
+
+### Official Q6 · RLHF: over-optimization, KL, the loop
+<small>from [[GenAI - Official Example Questions|Official]]</small>
+
+**Why does RLHF penalize the policy with β · KL to the reference model?**
+
+- [ ] **A** It stops the policy from optimizing the reward model’s score too far
+- [ ] **B** It keeps the policy close to the SFT model it started from
+- [ ] **C** It keeps the reward model close to its weights from before RL
+- [ ] **D** It rewards the policy for tokens the reference model finds unlikely
+
+> [!success]- Answer: A, B
+> If the policy chases the reward model too far, its score keeps rising while the real quality goes up and then down. The KL term pulls the policy back towards the frozen SFT model, harder the further it moves. The reward model does not change during RL.
+> *Training Paradigms II · RLHF: over-optimization, KL, the loop*
+
+### Mock A Q13 · KV cache size
+<small>from [[GenAI - Mock Test A|Mock A]]</small>
+
+**Generation with a KV cache: 24 layers, 16 key/value heads of size 128, stored in bf16 (2 bytes). What is true?**
+
+- [ ] **A** Keeping 16 query heads but sharing each key/value head among 4 query heads makes the cache 4× smaller
+- [ ] **B** The prompt is processed one token at a time during prefill
+- [ ] **C** Decoding speed is limited mostly by reading weights and cache from memory
+- [ ] **D** The cache grows by 2 · 24 · 16 · 128 · 2 bytes (≈ 192 KiB) per token
+
+> [!success]- Answer: A, C, D
+> 2 for K and V × layers × KV heads × head size × bytes. GQA with 4 KV heads instead of 16 shrinks it 4×. Decoding reads all weights and the whole cache for each new token: memory-bound. Prefill reads the whole prompt in parallel.
+> *Training Paradigms II · KV cache size*
+
+### Mock A Q14 · DPO
+<small>from [[GenAI - Mock Test A|Mock A]]</small>
+
+**DPO with β = 0.1. Policy log-probabilities: chosen −38, rejected −37. Reference: chosen −40, rejected −35. What is true?**
+
+- [ ] **A** gain⁺ = (−38) − (−40) = +2
+- [ ] **B** Since the policy gives the rejected answer the higher log-probability, the loss is above log 2 ≈ 0.69
+- [ ] **C** DPO needs a separately trained reward model
+- [ ] **D** The loss is −log σ(0.4) ≈ 0.51
+
+> [!success]- Answer: A, D
+> gain⁻ = (−37) − (−35) = −2, so 0.1 · [2 − (−2)] = 0.4; σ(0.4) ≈ 0.60, −log 0.60 ≈ 0.51 < 0.69. DPO compares each answer with the frozen reference, not absolute log-probs. It needs no reward model and no sampling.
+> *Training Paradigms II · DPO*
+
+### Mock A Q15 · KL penalty
+<small>from [[GenAI - Mock Test A|Mock A]]</small>
+
+**In RLHF, the reward model gives an answer 0.8, the KL to the reference is 1.5, and β = 0.1. What is true?**
+
+- [ ] **A** The KL penalty makes the reward model more accurate
+- [ ] **B** The reward used for the update is 0.65
+- [ ] **C** If the policy were identical to the reference, the KL would be 0
+- [ ] **D** A larger β lets the policy drift further from the reference
+
+> [!success]- Answer: B, C
+> 0.8 − 0.1 · 1.5 = 0.65. KL = Σ p_policy (log p_policy − log p_ref) is 0 only for identical distributions. The reward model is frozen during RL; a larger β pulls harder towards the reference.
+> *Training Paradigms II · KL penalty*
+
+### Mock A Q16 · GRPO vs PPO
+<small>from [[GenAI - Mock Test A|Mock A]]</small>
+
+**GRPO samples 4 answers to one prompt, with rewards 0.8, 0.5, 0.3, 0.1 (mean 0.425, std 0.259). What is true?**
+
+- [ ] **A** The answer with reward 0.3 is pushed down, although its reward is positive
+- [ ] **B** Like PPO, GRPO trains a value model to compute the baseline
+- [ ] **C** The best answer’s advantage is about +1.45
+- [ ] **D** All tokens of the first answer get the same advantage
+
+> [!success]- Answer: A, C, D
+> A = (r − mean) / std: (0.8 − 0.425) / 0.259 ≈ +1.45; (0.3 − 0.425) / 0.259 ≈ −0.48 < 0. GRPO gives every token of an answer its A. The group mean is the baseline: no value model (PPO’s Vₜ).
+> *Training Paradigms II · GRPO vs PPO*
+
+### Mock B Q13 · mid-training
+<small>from [[GenAI - Mock Test B|Mock B]]</small>
+
+**What is part of mid-training?**
+
+- [ ] **A** Finishing on the best data, including maths and reasoning
+- [ ] **B** Extending the context to longer rows
+- [ ] **C** Adding thinking traces as chat conversations with user and assistant roles
+- [ ] **D** Cooling down the learning rate
+
+> [!success]- Answer: A, B, D
+> Mid-training: cool down, finish on the best data, extend the context. Thinking traces go in as plain text without chat format; the chat template comes with post-training.
+> *Training Paradigms II · mid-training*
+
+### Mock B Q14 · YaRN
+<small>from [[GenAI - Mock Test B|Mock B]]</small>
+
+**Olmo 3 7B (RoPE base 500,000) is extended from 8K to 64K with YaRN, scale 8. What is true?**
+
+- [ ] **A** Dividing every pair by 8 instead would blur the order of nearby tokens
+- [ ] **B** The fastest RoPE pairs are left unchanged
+- [ ] **C** The slowest pairs are slowed down by a factor of 8
+- [ ] **D** With YaRN, no training on long documents is needed
+
+> [!success]- Answer: A, B, C
+> Pair 1 turns 1,304 times in 8K: every angle seen, keep it. Pair 48 turns only 31°: beyond 8K it would reach unseen angles, so ÷8 maps 0–64K into the seen range. A long-context stage (64K rows) still follows.
+> *Training Paradigms II · YaRN*
+
+### Mock B Q15 · the baseline
+<small>from [[GenAI - Mock Test B|Mock B]]</small>
+
+**Four answers get rewards 0.8, 0.5, 0.3 and 0.1. Compare L = −r · Σ log p with L = −(r − b) · Σ log p, b = 0.425. What is true?**
+
+- [ ] **A** Without the baseline, all four answers are made more likely
+- [ ] **B** In PPO, the baseline is the value model’s prediction Vₜ
+- [ ] **C** The baseline changes which answer has the highest reward
+- [ ] **D** With the baseline, answers below the average are made less likely
+
+> [!success]- Answer: A, B, D
+> All rewards are positive, so −r · Σ log p pushes every answer up, the bad ones just less. r − b is negative for 0.3 and 0.1. Subtracting a constant does not reorder rewards. PPO: Aₜ = Gₜ − Vₜ; GRPO: the group mean.
+> *Training Paradigms II · the baseline*
+
+### Mock B Q16 · reward model
+<small>from [[GenAI - Mock Test B|Mock B]]</small>
+
+**A reward model is trained on people’s rankings of 4 answers to one prompt. What is true?**
+
+- [ ] **A** Each pair’s loss is −log σ(r⁺ − r⁻)
+- [ ] **B** During RL, the reward model keeps training alongside the policy
+- [ ] **C** The ranking gives 6 pairs of a better and a worse answer
+- [ ] **D** Only the difference between the two scores matters for the loss
+
+> [!success]- Answer: A, C, D
+> 4 choose 2 = 6. With r⁺ = 1.4 and r⁻ = −0.6: −log σ(2.0) ≈ 0.13. Adding a constant to both scores leaves the loss unchanged. During RL the reward model is frozen.
+> *Training Paradigms II · reward model*
+
+### Mock C Q13 · MLA and GQA
+<small>from [[GenAI - Mock Test C|Mock C]]</small>
+
+**What is true about grouped-query attention (GQA) and multi-head latent attention (MLA)?**
+
+- [ ] **A** Both make the KV cache smaller
+- [ ] **B** In GQA several query heads share one key/value head
+- [ ] **C** MLA caches a small latent per token (512 numbers in DeepSeek-V3) instead of full keys and values
+- [ ] **D** In MLA, W^UK can be folded into the query, so the full keys need not be built
+
+> [!success]- Answer: A, B, C, D
+> MLA: C = X W^DKV (7,168 → 512); K = C W^UK and V = C W^UV (512 → 16,384). qₜkⱼᵀ = (qₜ W^UKᵀ) cⱼᵀ. 512 vs 2 · 16,384: 64× less cache.
+> *Training Paradigms II · MLA and GQA*
+
+### Mock C Q14 · packing long rows
+<small>from [[GenAI - Mock Test C|Mock C]]</small>
+
+**In the long-context stage, a 64K row packs a 30K PDF together with several short documents. What is true?**
+
+- [ ] **A** Intra-document masking is what lets the PDF be seen in one piece
+- [ ] **B** Intra-document masking puts −∞ between tokens of different documents
+- [ ] **C** Without extra masking, tokens of a later short document could attend to the PDF
+- [ ] **D** With intra-document masking, the <|endoftext|> separators are no longer needed
+
+> [!success]- Answer: B, C
+> The causal mask alone lets every token see everything before it in the row. Intra-document masking blocks attention across documents. The PDF fits in one piece because the rows are 64K long; the separators still mark where documents end.
+> *Training Paradigms II · packing long rows*
+
+### Mock C Q15 · on-policy distillation
+<small>from [[GenAI - Mock Test C|Mock C]]</small>
+
+**On-policy distillation: for three tokens of the student’s answer, the student gives p = 0.60, 0.90, 0.30 and the teacher p = 0.70, 0.90, 0.02. What is true?**
+
+- [ ] **A** The grades are held fixed, like rewards
+- [ ] **B** The teacher writes the answer and the student copies it
+- [ ] **C** The first token’s grade is about +0.15
+- [ ] **D** The third token is pushed down
+
+> [!success]- Answer: A, C, D
+> grade = log p_teacher − log p_student: log(0.7/0.6) ≈ +0.15, 0, log(0.02/0.3) ≈ −2.71. The student writes (on-policy); the teacher only scores, in one forward pass.
+> *Training Paradigms II · on-policy distillation*
+
+### Mock C Q16 · RLVR
+<small>from [[GenAI - Mock Test C|Mock C]]</small>
+
+**Which of these tasks can be trained with RLVR, i.e. with a program that checks the answer and returns 1 or 0?**
+
+- [ ] **A** Summarise this article
+- [ ] **B** Comfort a sad friend
+- [ ] **C** Write a poem about cows
+- [ ] **D** Decide whether this joke is funny
+
+> [!success]- Answer: none (no tick = full points)
+> None: there is no program that can check any of these. They need RLHF or RLAIF (a reward model or a judge). RLVR fits maths answers, unit tests, checkable constraints, generated puzzles, valid JSON or tool calls.
+> *Training Paradigms II · RLVR*
+
+<!-- end of test questions -->
+
 Related: [[GenAI - Glossary|Glossary: symbols & variables]] · [[2026-11-04 - Training Paradigms I|Training Paradigms I]] · [[2026-11-18 - Applied Generative AI I|Applied Generative AI I]] · [[GenAI Lab]]

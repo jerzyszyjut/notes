@@ -197,4 +197,195 @@ Noise "type" per modality: Gaussian noise for pixels/sound/video; **masks** for 
 - BPE starts from **bytes** (256), so there are no unknown tokens.
 - Symbolic systems fail on cases outside their rules; subsymbolic systems can only be corrected indirectly.
 
+
+## Test questions for this lecture (13)
+
+> [!info] Same format as the test
+> 0 to 4 options can be correct. Tick, then open the answer. **+1.5 ÷ n** per correct tick, **−0.75** per wrong tick, never below 0; no correct option → no tick = 1.5.
+> The same questions, mixed across lectures and timed, are in the mock tests ([[_GenAI Test 1 - Start Here|Start Here]]) and in the Quiz tab of the [[GenAI Lab]].
+
+### Official Q1 · the lookup is static, context pulls bank apart
+<small>from [[GenAI - Official Example Questions|Official]]</small>
+
+**In a decoder-only transformer, what is true about “·bank” in these two phrases: “the ·river ·bank” and “the ·savings ·bank”?**
+
+- [ ] **A** The embedding layer gives ·bank the same vector in both phrases
+- [ ] **B** After attention, ·bank’s vector holds meaning from the words before it
+- [ ] **C** After positional encoding, the two ·bank vectors are different
+- [ ] **D** The feed-forward layers add meaning from the neighbouring words
+
+> [!success]- Answer: A, B
+> The embedding is a lookup: the same token always gets the same row. ·bank is the third token in both, so its position is the same too. Only attention mixes tokens; the feed-forward looks at each token alone.
+> *Introduction to Generative AI · the lookup is static, context pulls bank apart*
+
+### Mock A Q1 · discriminative vs generative
+<small>from [[GenAI - Mock Test A|Mock A]]</small>
+
+**What is true about discriminative and generative models?**
+
+- [ ] **A** A random forest that classifies cows is an example of symbolic AI
+- [ ] **B** Pictures of cows alone are enough to train a cow / not-cow classifier
+- [ ] **C** A generative model can produce new examples that look like its training data
+- [ ] **D** A discriminative model learns p(y | x), e.g. how likely “cow” is given a picture
+
+> [!success]- Answer: C, D
+> Discriminative models learn where one class ends and the next begins, so they need examples of both classes. Generative models learn p(x), the shape of the data itself, and can sample from it. A random forest learns its splits from data: subsymbolic.
+> *Introduction to Generative AI · discriminative vs generative*
+
+### Mock A Q2 · joint, conditional, marginal
+<small>from [[GenAI - Mock Test A|Mock A]]</small>
+
+**On the farm, p(cow, moo) = 14 %, p(dog, moo) = 1 %, p(cat, moo) = 1 % and p(cow) = 40 %. What is true?**
+
+- [ ] **A** p(cow | moo) ≈ 88 %
+- [ ] **B** p(cow, moo) = p(cow) · p(moo)
+- [ ] **C** p(moo | cow) = 14 %
+- [ ] **D** p(moo) = 16 %
+
+> [!success]- Answer: A, D
+> Marginal: sum the column, 14 + 1 + 1 = 16 %. Conditional: 14 / 16 = 87.5 %. p(moo | cow) = 14 / 40 = 35 %. p(cow) · p(moo) = 6.4 % ≠ 14 %: animal and sound are not independent.
+> *Introduction to Generative AI · joint, conditional, marginal*
+
+### Mock A Q3 · diffusion
+<small>from [[GenAI - Mock Test A|Mock A]]</small>
+
+**A diffusion model for pictures is trained and then used to generate. What is true?**
+
+- [ ] **A** During training, the network learns to predict the noise that was mixed into a clean picture
+- [ ] **B** Like an autoregressive model, it writes the picture one patch at a time, each patch fixed once written
+- [ ] **C** Generation starts from pure noise and removes predicted noise over many steps
+- [ ] **D** The noise added during training is produced by the network itself
+
+> [!success]- Answer: A, C
+> Forward diffusion draws noise and mixes it in (nothing learned); the network predicts that noise. Backward diffusion starts from noise and subtracts a little predicted noise each step (e.g. 50). Every pixel is updated at every step: all at once, not piece by piece.
+> *Introduction to Generative AI · diffusion*
+
+### Mock B Q1 · symbolic AI
+<small>from [[GenAI - Mock Test B|Mock B]]</small>
+
+**A system uses the rule “if horns and udder and hooves and tail then cow”. What is true?**
+
+- [ ] **A** It classifies a dehorned cow as not a cow
+- [ ] **B** It is an example of subsymbolic AI
+- [ ] **C** A neural network trained on cow pictures can be fixed the same way, by editing one weight
+- [ ] **D** Its mistake can be fixed directly by editing the rule
+
+> [!success]- Answer: A, D
+> Symbolic systems reason only within explicitly encoded patterns, so unseen cases break them; but the rules are readable and editable. Subsymbolic models can only be corrected indirectly, by retraining on other data.
+> *Introduction to Generative AI · symbolic AI*
+
+### Mock B Q2 · sound as tokens
+<small>from [[GenAI - Mock Test B|Mock B]]</small>
+
+**Sound is turned into tokens. What is true?**
+
+- [ ] **A** 2 seconds at 24 kHz are 48,000 numbers
+- [ ] **B** Residual vector quantisation applies a further codebook to what the previous one left out
+- [ ] **C** T seconds at sample rate f_s give a vector x with f_s · T numbers
+- [ ] **D** Each audio sample becomes one token
+
+> [!success]- Answer: A, B, C
+> A window of samples goes through a learned encoder to one vector zₜ; optionally it is snapped to the nearest codebook entry, often repeated on the remainder (EnCodec). One token per window, not per sample.
+> *Introduction to Generative AI · sound as tokens*
+
+### Mock B Q3 · contextual embeddings
+<small>from [[GenAI - Mock Test B|Mock B]]</small>
+
+**Qwen3-0.6B reads “The cat says meow. The cow says”. What is true about the vector of the last token, ·says?**
+
+- [ ] **A** Only the last layers turn it into a confident prediction of ·moo
+- [ ] **B** Already a few layers in, it reads as ·moo with high probability
+- [ ] **C** Right after the embedding lookup, it is the same vector as ·says in any other sentence
+- [ ] **D** The embedding table is where the context changes it
+
+> [!success]- Answer: A, C
+> The lookup is static. Read through the final layer, layer 25 still says ·cow; ·moo appears at layer 26 and reaches 93.5 % at layer 28. The context comes in through attention, not through the table.
+> *Introduction to Generative AI · contextual embeddings*
+
+### Mock C Q1 · the probabilistic view
+<small>from [[GenAI - Mock Test C|Mock C]]</small>
+
+**What is true about the probabilistic view of AI?**
+
+- [ ] **A** The goal of a generative model is p_θ(x) ≈ p(x)
+- [ ] **B** Qwen3-0.6B-Base finds “The cow says moo” about four times as likely as “The cow says meow”
+- [ ] **C** A discriminative model can generate new pictures by sampling p(cow | picture)
+- [ ] **D** A discriminative model estimates p(picture)
+
+> [!success]- Answer: A, B
+> Regularities of the world show up as differences in probability. Discriminative: p(cow | picture), a score for a given input, nothing to sample pictures from. Generative: p(picture), the data itself.
+> *Introduction to Generative AI · the probabilistic view*
+
+### Mock C Q2 · BPE tokenization
+<small>from [[GenAI - Mock Test C|Mock C]]</small>
+
+**A byte-level BPE vocabulary learned 256 ·c, 258 the, 260 ow, 262 ·the, 263 ·cow, 271 ·say, 272 ·café, 273 ·in. It tokenizes “the cows in the café say wow” as (258, 263, 115, 273, 262, 272, 271, 32, 119, 260). What is true?**
+
+- [ ] **A** 32 is the byte for a space, kept as its own token here
+- [ ] **B** <|endoftext|> was learned as a merge of frequent bytes
+- [ ] **C** “·cows” is split into ·cow and s because no merge produced ·cows
+- [ ] **D** “wow” is split because no merge covers ·wow as a whole
+
+> [!success]- Answer: A, C, D
+> Tokenizing applies the learned merges; whatever is not covered stays as smaller pieces, down to single bytes (115 = s, 119 = w, 32 = space). Special tokens are added after the merges, not learned from pairs.
+> *Introduction to Generative AI · BPE tokenization*
+
+### Mock C Q3 · symbolic vs subsymbolic
+<small>from [[GenAI - Mock Test C|Mock C]]</small>
+
+**What is true about symbolic and subsymbolic AI?**
+
+- [ ] **A** Symbolic AI learns its rules from data
+- [ ] **B** A neural network is interpretable because each weight stands for a concept
+- [ ] **C** Subsymbolic systems are corrected by editing their rules
+- [ ] **D** A random forest is symbolic, because its trees are made of rules
+
+> [!success]- Answer: none (no tick = full points)
+> None. A random forest learns from data: subsymbolic. Subsymbolic models are corrected only by retraining; symbolic rules are written by people; neural network weights are hard to interpret. (No tick at all scores 1.5.)
+> *Introduction to Generative AI · symbolic vs subsymbolic*
+
+### Extra Q1 · BPE training
+<small>from [[GenAI - Extra Questions|Extra]]</small>
+
+**What is true about training a byte-level BPE tokenizer?**
+
+- [ ] **A** Token IDs that are numerically close have similar meanings
+- [ ] **B** Training starts from a vocabulary of the 256 byte values
+- [ ] **C** Each merge adds the most frequent adjacent pair as a new token
+- [ ] **D** A word never seen in training cannot be tokenized
+
+> [!success]- Answer: B, C
+> Start from 256 bytes, repeatedly merge the most frequent pair (256 ·c, 257 he, 258 the …), then add special tokens. Unseen words fall back to smaller pieces. An ID is an address, not a meaning.
+> *Introduction to Generative AI · BPE training*
+
+### Extra Q2 · patches
+<small>from [[GenAI - Extra Questions|Extra]]</small>
+
+**A picture is cut into 8 × 8 RGB patches, each embedded as W xᵢ + pᵢ. What is true?**
+
+- [ ] **A** pᵢ tells the model where (row, column) the patch is
+- [ ] **B** Snapping to a codebook entry is needed before a transformer can read the patch
+- [ ] **C** xᵢ has 192 numbers
+- [ ] **D** Each patch position has its own matrix W
+
+> [!success]- Answer: A, C
+> 8 · 8 · 3 = 192. One learned W ∈ ℝ^(d×192) is shared by all patches; the position comes from pᵢ. Snapping to a codebook ID is optional; continuous vectors can go straight in.
+> *Introduction to Generative AI · patches*
+
+### Extra Q3 · autoregression vs diffusion
+<small>from [[GenAI - Extra Questions|Extra]]</small>
+
+**What is true about autoregressive and diffusion generation?**
+
+- [ ] **A** An autoregressive model keeps each token fixed once it is written
+- [ ] **B** For text, masks can play the role of noise in diffusion
+- [ ] **C** Diffusion updates every piece at every step
+- [ ] **D** Autoregressive models cannot generate pictures
+
+> [!success]- Answer: A, B, C
+> Pictures can be cut into patches and generated token by token too (e.g. Emu3). Diffusion noise per modality: Gaussian noise for pixels, masks for text, probabilities for DNA.
+> *Introduction to Generative AI · autoregression vs diffusion*
+
+<!-- end of test questions -->
+
 Related: [[GenAI - Glossary|Glossary: symbols & variables]] · [[2026-10-28 - Theoretical Foundations of Language Modelling|Theoretical Foundations of Language Modelling]] · [[GenAI - Mock Test A|Mock Test A]]

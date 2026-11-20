@@ -264,4 +264,321 @@ flowchart BT
 - LayerNorm normalises **within one token's vector**.
 - Generation uses only the last row of logits; training uses all rows.
 
+
+## Test questions for this lecture (22)
+
+> [!info] Same format as the test
+> 0 to 4 options can be correct. Tick, then open the answer. **+1.5 ÷ n** per correct tick, **−0.75** per wrong tick, never below 0; no correct option → no tick = 1.5.
+> The same questions, mixed across lectures and timed, are in the mock tests ([[_GenAI Test 1 - Start Here|Start Here]]) and in the Quiz tab of the [[GenAI Lab]].
+
+### Official Q2 · attention alone: no order
+<small>from [[GenAI - Official Example Questions|Official]]</small>
+
+**Attention without positional encoding and without a mask reads “dog bites man” and “man bites dog”. Each word is one token. What is true?**
+
+- [ ] **A** The word dog gets the same output vector in both
+- [ ] **B** Adding the same vector to every embedding tells the two apart
+- [ ] **C** Stacking more of these attention layers tells the two apart
+- [ ] **D** The token IDs tell the model the order of the words
+
+> [!success]- Answer: A
+> Attention only compares pairs of tokens. Change the order of the input and you get the same outputs in the new order, in every layer. A vector added to every token is the same everywhere, and a token ID says which token it is, not where it stands.
+> *Theoretical Foundations of Language Modelling · attention alone: no order*
+
+### Official Q5 · softmax, and why the scores are scaled
+<small>from [[GenAI - Official Example Questions|Official]]</small>
+
+**Why are the attention scores divided by √dₖ before the softmax?**
+
+- [ ] **A** Without it, large scores give one token almost all the weight
+- [ ] **B** Without it, almost no gradient flows back through the softmax
+- [ ] **C** Without it, the scores grow with the length of the sequence
+- [ ] **D** Without it, the weights in a row do not add up to 1
+
+> [!success]- Answer: A, B
+> Scores grow with dₖ, the length of q and k, not with the length of the sequence. With large scores, softmax gives one token nearly everything and the rest almost 0, so there is almost no gradient. Dividing keeps the order of the scores; softmax itself makes the weights add up to 1.
+> *Theoretical Foundations of Language Modelling · softmax, and why the scores are scaled*
+
+### Official Q7 · masked attention: the chain rule inside attention
+<small>from [[GenAI - Official Example Questions|Official]]</small>
+
+**In masked self-attention, the scores for later tokens are set to −∞ before the softmax. What is true?**
+
+- [ ] **A** The weights for later tokens come out as exactly 0
+- [ ] **B** The weights in each row still add up to 1
+- [ ] **C** Setting those weights to 0 after the softmax would give the same result
+- [ ] **D** Because of the mask, training has to go through the tokens one after the other
+
+> [!success]- Answer: A, B
+> e^−∞ = 0, so the softmax gives later tokens no weight and shares the whole 1 among the tokens up to here. Zeroing the weights after the softmax leaves rows that add up to less than 1. The mask is what lets training run every position at once: each sees exactly what it would see while generating.
+> *Theoretical Foundations of Language Modelling · masked attention: the chain rule inside attention*
+
+### Mock A Q4 · embedding table
+<small>from [[GenAI - Mock Test A|Mock A]]</small>
+
+**Qwen3-0.6B-Base has an embedding table with 151,936 rows of 1,024 numbers. What is true?**
+
+- [ ] **A** Each of the 1,024 dimensions stands for a nameable property such as “animal” or “dairy”
+- [ ] **B** The table stays at its random initial values; only attention and feed-forward weights are trained
+- [ ] **C** There is one row per token ID in the vocabulary
+- [ ] **D** Looking up ·cow returns row 19362, the same vector in every sentence
+
+> [!success]- Answer: C, D
+> The embedding is a lookup: token ID → row. It is learned like every other weight. Real dimensions have no names; the animal / royalty columns on the slide were an illustration.
+> *Theoretical Foundations of Language Modelling · embedding table*
+
+### Mock A Q5 · scaling by √dk
+<small>from [[GenAI - Mock Test A|Mock A]]</small>
+
+**A head has dₖ = 64, so its scores are divided by 8 before the softmax. What is true?**
+
+- [ ] **A** The division can change which key gets the highest weight
+- [ ] **B** Without it, the spread of the scores grows with dₖ, the length of q and k
+- [ ] **C** For dₖ = 256 the matching divisor would be 16
+- [ ] **D** After the softmax, the weights in each row still add up to 1
+
+> [!success]- Answer: B, C, D
+> If q and k have entries of variance 1, q · k has variance dₖ, so its spread grows like √dₖ; dividing by √dₖ undoes that (√256 = 16). Dividing by a positive constant keeps the order of the scores; softmax makes the row sum to 1.
+> *Theoretical Foundations of Language Modelling · scaling by √dk*
+
+### Mock A Q6 · masked attention
+<small>from [[GenAI - Mock Test A|Mock A]]</small>
+
+**A decoder is trained with a causal mask on rows of 4,096 tokens. What is true?**
+
+- [ ] **A** The token at position 1 attends only to itself
+- [ ] **B** Training has to loop over the positions one after the other
+- [ ] **C** The prediction at position 10 may use token 11
+- [ ] **D** All 4,096 next-token predictions of a row are computed in one forward pass
+
+> [!success]- Answer: A, D
+> The mask puts −∞ above the diagonal, so each position sees exactly what it would see while generating. That is what makes it safe to compute every position in parallel. Position 1 has only itself to look at.
+> *Theoretical Foundations of Language Modelling · masked attention*
+
+### Mock A Q7 · RoPE
+<small>from [[GenAI - Mock Test A|Mock A]]</small>
+
+**What is true about rotary position embeddings (RoPE)?**
+
+- [ ] **A** For given q and k, the score between positions m and n depends only on n − m
+- [ ] **B** Queries and keys are rotated, values are not
+- [ ] **C** Every pair of dimensions turns by the same angle per position
+- [ ] **D** The rotation vector is added once to the embeddings, before the first block
+
+> [!success]- Answer: A, B
+> (R(m)q)ᵀ(R(n)k) = qᵀR(n − m)k: a relative score. RoPE is applied to q and k inside every attention layer, not added at the input. Each pair has its own speed θᵢ = b^(−2(i−1)/d): fast pairs for nearby order, slow pairs for long distances.
+> *Theoretical Foundations of Language Modelling · RoPE*
+
+### Mock A Q8 · LayerNorm
+<small>from [[GenAI - Mock Test A|Mock A]]</small>
+
+**LayerNorm(x) = γ ⊙ (x − μ) / √(σ² + ε) + β. What is true?**
+
+- [ ] **A** γ and β are learned, one value per dimension
+- [ ] **B** ε is a learned bias that shifts the output
+- [ ] **C** μ is the mean over all tokens in the batch
+- [ ] **D** μ and σ² are computed over the d numbers of one token’s vector
+
+> [!success]- Answer: A, D
+> LayerNorm normalises each token’s own vector. ε ≈ 10⁻⁶ only avoids dividing by 0; β is the learned shift. γ and β start at 1 and 0 and are learned per dimension.
+> *Theoretical Foundations of Language Modelling · LayerNorm*
+
+### Mock B Q4 · mask without positional encoding
+<small>from [[GenAI - Mock Test B|Mock B]]</small>
+
+**A decoder has causal masked attention but no positional encoding. It reads “dog bites man” and “man bites dog” (one token per word). What is true?**
+
+- [ ] **A** The output for the first token depends only on that token
+- [ ] **B** The outputs are the same vectors as before, only in permuted order
+- [ ] **C** “dog” gets the same output vector in both sentences
+- [ ] **D** In principle the model can tell positions apart, since each position sees a different number of tokens
+
+> [!success]- Answer: A, D
+> The permutation argument holds only without the mask. With it, “dog” first sees only itself; “dog” last sees all three words. That is why the example test said: without positional encoding and without a mask.
+> *Theoretical Foundations of Language Modelling · mask without positional encoding*
+
+### Mock B Q5 · softmax
+<small>from [[GenAI - Mock Test B|Mock B]]</small>
+
+**One row of scaled scores is s = (2, 1, 0). What is true about the softmax weights?**
+
+- [ ] **A** The largest score gets the largest weight
+- [ ] **B** Adding 5 to every score changes the weights
+- [ ] **C** They add up to 1
+- [ ] **D** Multiplying every score by 10 brings the weights closer to (1, 0, 0)
+
+> [!success]- Answer: A, C, D
+> softmax(s)ⱼ = e^sⱼ / Σ e^sᵢ: positive, sums to 1, keeps the order. A constant shift cancels out. Larger scores sharpen it toward one-hot: exactly why scores are divided by √dₖ.
+> *Theoretical Foundations of Language Modelling · softmax*
+
+### Mock B Q6 · shapes in attention
+<small>from [[GenAI - Mock Test B|Mock B]]</small>
+
+**X has shape n × d_model; W^Q and W^K are d_model × dₖ; W^V is d_model × d_v. What is true?**
+
+- [ ] **A** QKᵀ has shape dₖ × dₖ
+- [ ] **B** QKᵀ has shape n × n
+- [ ] **C** The output softmax(QKᵀ/√dₖ)V has shape n × d_v
+- [ ] **D** Row i of the weights says how much token i takes from each token j
+
+> [!success]- Answer: B, C, D
+> Q and K are n × dₖ, so QKᵀ is n × n: a score for every pair. Softmax runs along each row (over j). Weights (n × n) times V (n × d_v) give one new vector per token.
+> *Theoretical Foundations of Language Modelling · shapes in attention*
+
+### Mock B Q7 · positional encodings
+<small>from [[GenAI - Mock Test B|Mock B]]</small>
+
+**Learned absolute vs sinusoidal positional encodings. What is true?**
+
+- [ ] **A** With sinusoidal encodings, k positions later is the same fixed turn of the vector from any position
+- [ ] **B** A learned table with 1,024 rows has no vector for position 1,024
+- [ ] **C** Sinusoidal encodings have no parameters to learn
+- [ ] **D** Both are applied by rotating queries and keys
+
+> [!success]- Answer: A, B, C
+> GPT-2’s learned table: fixed context length, late rows seen only in long texts. Sinusoidal: computed for any position; distances only implicit. Both are added to the token vectors; rotating q and k is RoPE.
+> *Theoretical Foundations of Language Modelling · positional encodings*
+
+### Mock B Q8 · output layer
+<small>from [[GenAI - Mock Test B|Mock B]]</small>
+
+**After the last block, “The cow says” gives a matrix H of shape 3 × 1,024 in Qwen3-0.6B. What is true?**
+
+- [ ] **A** In Qwen3-0.6B the output layer shares its weights with the embedding table
+- [ ] **B** To generate the next token, only the last row is needed
+- [ ] **C** A linear layer maps each row to 151,936 logits
+- [ ] **D** Softmax turns each row into a distribution over the next token
+
+> [!success]- Answer: A, B, C, D
+> Linear d → V gives one number per vocabulary entry; softmax makes them probabilities. Training scores every row (each predicts the token after it); generation uses only the last. Qwen3-0.6B ties the head to the embedding table.
+> *Theoretical Foundations of Language Modelling · output layer*
+
+### Mock C Q4 · which parts mix tokens
+<small>from [[GenAI - Mock Test C|Mock C]]</small>
+
+**In a decoder-only transformer, which parts let a token’s vector take in information from other positions?**
+
+- [ ] **A** The feed-forward layer
+- [ ] **B** LayerNorm
+- [ ] **C** The token embedding
+- [ ] **D** Masked multi-head attention
+
+> [!success]- Answer: D
+> Only attention compares and mixes tokens. Embedding (a lookup), feed-forward (each token alone) and LayerNorm (over one token’s own numbers) all work per token.
+> *Theoretical Foundations of Language Modelling · which parts mix tokens*
+
+### Mock C Q5 · dₖ and saturation
+<small>from [[GenAI - Mock Test C|Mock C]]</small>
+
+**Two heads skip the √dₖ scaling. Head A has dₖ = 16, head B has dₖ = 1,024; q and k have entries of variance 1. What is true?**
+
+- [ ] **A** Head B’s scores typically spread about 8 times wider than head A’s
+- [ ] **B** Head B’s weights no longer add up to 1 per row
+- [ ] **C** Less gradient flows back through head B’s softmax
+- [ ] **D** Head B’s softmax is more likely to give one token nearly all the weight
+
+> [!success]- Answer: A, C, D
+> Standard deviation √dₖ: √1,024 / √16 = 32 / 4 = 8. Wide scores saturate the softmax: nearly one-hot, gradients ≈ 0. The softmax still sums to 1 in every case.
+> *Theoretical Foundations of Language Modelling · dₖ and saturation*
+
+### Mock C Q6 · the causal mask
+<small>from [[GenAI - Mock Test C|Mock C]]</small>
+
+**A causal mask M is added to the scaled scores before the softmax. What is true?**
+
+- [ ] **A** The diagonal is masked too, so a token cannot attend to itself
+- [ ] **B** The mask is applied to V rather than to the scores
+- [ ] **C** M holds −∞ strictly above the diagonal and 0 elsewhere
+- [ ] **D** After the softmax, the first row is (1, 0, 0, …)
+
+> [!success]- Answer: C, D
+> Each token may see the tokens before it and itself. Row 1 has only itself, so all its weight goes there. The mask acts on the scores; e^(−∞) = 0 gives exactly zero weight to the future.
+> *Theoretical Foundations of Language Modelling · the causal mask*
+
+### Mock C Q7 · Add & Norm
+<small>from [[GenAI - Mock Test C|Mock C]]</small>
+
+**A block computes x + Attention(Norm(x)), then x + FeedForward(Norm(x)). What is true?**
+
+- [ ] **A** Attention adds what it found to the token’s vector, which is carried straight up
+- [ ] **B** The norm is computed across all tokens of the sequence
+- [ ] **C** The residual path helps gradients flow through deep stacks
+- [ ] **D** Qwen3’s RMSNorm skips subtracting the mean
+
+> [!success]- Answer: A, C, D
+> This is the pre-norm residual stream. The norm works on each token’s own vector. RMSNorm only divides by the root mean square (no μ, no β).
+> *Theoretical Foundations of Language Modelling · Add & Norm*
+
+### Mock C Q8 · RoPE frequencies
+<small>from [[GenAI - Mock Test C|Mock C]]</small>
+
+**RoPE turns pair i by θᵢ = b^(−2(i−1)/d) per position. What is true?**
+
+- [ ] **A** b sets the maximum number of tokens the model can read
+- [ ] **B** Qwen3 uses b = 1,000,000; the original value is 10,000
+- [ ] **C** A larger base b makes the slowest pairs turn even more slowly
+- [ ] **D** Pair 1 turns fastest
+
+> [!success]- Answer: B, C, D
+> θ₁ = b⁰ = 1 rad per position; later pairs are exponentially slower, more so for larger b. The base is not a hard length limit; context length depends on what was trained (and stretching like YaRN).
+> *Theoretical Foundations of Language Modelling · RoPE frequencies*
+
+### Extra Q4 · multi-head attention
+<small>from [[GenAI - Extra Questions|Extra]]</small>
+
+**The original transformer has d_model = 512 and h = 8 heads. What is true?**
+
+- [ ] **A** Each head works with queries and keys of length 64
+- [ ] **B** The heads’ outputs are concatenated and multiplied by W^O
+- [ ] **C** 8 heads cost about 8× the compute of one head of width 512
+- [ ] **D** Each head sees only one eighth of the tokens
+
+> [!success]- Answer: A, B
+> Q, K and V are cut into h slices of d_model / h = 64; every head sees all tokens, from its own perspective. Total width stays 512, so the cost is about that of one wide head.
+> *Theoretical Foundations of Language Modelling · multi-head attention*
+
+### Extra Q5 · feed-forward
+<small>from [[GenAI - Extra Questions|Extra]]</small>
+
+**What is true about the feed-forward layer in a decoder block?**
+
+- [ ] **A** In a mixture of experts, the router picks experts once per sequence
+- [ ] **B** It applies the same network to each token on its own
+- [ ] **C** It holds most of a block’s weights
+- [ ] **D** It is where information from other positions is combined
+
+> [!success]- Answer: B, C
+> 512 → 2,048 → 512: 2 · 512 · 2,048 ≈ 2.1M weights vs 4 · 512² ≈ 1.05M for attention. It turns what attention gathered into new features (e.g. Eiffel Tower → Paris). MoE routing is per token.
+> *Theoretical Foundations of Language Modelling · feed-forward*
+
+### Extra Q6 · values
+<small>from [[GenAI - Extra Questions|Extra]]</small>
+
+**Why does attention use a learned value projection, v = x W^V?**
+
+- [ ] **A** W^V is applied to the attention weights after the softmax
+- [ ] **B** Using the embedding itself as the value can also work
+- [ ] **C** So that how a token shifts others can differ from where it sits in meaning space
+- [ ] **D** Without W^V, the attention weights could not be computed
+
+> [!success]- Answer: B, C
+> Weights come from Q and K; values decide what is moved. The simplest shift uses x itself, and that can work (He & Hofmann, ICLR 2024), but a separate projection usually does better. V = X W^V, then weights × V.
+> *Theoretical Foundations of Language Modelling · values*
+
+### Extra Q7 · two meanings of bank
+<small>from [[GenAI - Extra Questions|Extra]]</small>
+
+**“He sat on the river bank” vs “She put her money in the bank”. What is true about ·bank after the last layer of Qwen3-0.6B?**
+
+- [ ] **A** The two vectors differ
+- [ ] **B** The difference comes from attention to the other words
+- [ ] **C** The embedding lookups already differ
+- [ ] **D** The feed-forward layers alone could produce the difference, without attention
+
+> [!success]- Answer: A, B
+> Same lookup row in both; after 28 layers cosine similarity 0.79. Only attention brings in the neighbours; the feed-forward sees each token alone.
+> *Theoretical Foundations of Language Modelling · two meanings of bank*
+
+<!-- end of test questions -->
+
 Related: [[GenAI - Glossary|Glossary: symbols & variables]] · [[2026-10-21 - Introduction to Generative AI|Introduction to Generative AI]] · [[2026-11-04 - Training Paradigms I|Training Paradigms I]] · [[GenAI Lab]]
