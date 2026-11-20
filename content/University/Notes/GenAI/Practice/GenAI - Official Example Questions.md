@@ -26,8 +26,8 @@ The seven questions the course published “as on the test, each with its answer
 - [ ] **C** After positional encoding, the two ·bank vectors are different <small>· look in [[2026-10-28 - Theoretical Foundations of Language Modelling#3 · Position – attention alone has no order|LM §3 Position]]</small>
 - [ ] **D** The feed-forward layers add meaning from the neighbouring words <small>· look in [[2026-10-28 - Theoretical Foundations of Language Modelling#4 · Feed-forward – knowledge|LM §4 Feed-forward]]</small>
 
-> [!success]- Answer: A, B
-> A ✓ · B ✓ · C ✗ · D ✗
+> [!success]- Answer (click to open)
+> **A, B** · A ✓ · B ✓ · C ✗ · D ✗
 >
 > The embedding is a lookup: the same token always gets the same row. ·bank is the third token in both, so its position is the same too. Only attention mixes tokens; the feed-forward looks at each token alone.
 
@@ -43,8 +43,8 @@ The seven questions the course published “as on the test, each with its answer
 - [ ] **C** Stacking more of these attention layers tells the two apart <small>· look in [[2026-10-28 - Theoretical Foundations of Language Modelling#3 · Position – attention alone has no order|LM §3 Position]]</small>
 - [ ] **D** The token IDs tell the model the order of the words <small>· look in [[2026-10-28 - Theoretical Foundations of Language Modelling#3 · Position – attention alone has no order|LM §3 Position]]</small>
 
-> [!success]- Answer: A
-> A ✓ · B ✗ · C ✗ · D ✗
+> [!success]- Answer (click to open)
+> **A** · A ✓ · B ✗ · C ✗ · D ✗
 >
 > Attention only compares pairs of tokens. Change the order of the input and you get the same outputs in the new order, in every layer. A vector added to every token is the same everywhere, and a token ID says which token it is, not where it stands.
 
@@ -60,8 +60,8 @@ The seven questions the course published “as on the test, each with its answer
 - [ ] **C** Optimizer step: two more operations for each weight and token <small>· look in [[2026-11-04 - Training Paradigms I#1.3 Where C ≈ 6·N·D comes from|TP I §1.3 Where C ≈ 6·N·D comes from]]</small>
 - [ ] **D** Attention: two more operations for comparing the tokens <small>· look in [[2026-11-04 - Training Paradigms I#1.3 Where C ≈ 6·N·D comes from|TP I §1.3 Where C ≈ 6·N·D comes from]]</small>
 
-> [!success]- Answer: A, B
-> A ✓ · B ✓ · C ✗ · D ✗
+> [!success]- Answer (click to open)
+> **A, B** · A ✓ · B ✓ · C ✗ · D ✗
 >
 > Forward: 2 operations for each weight and token. Backward: 4. Together: 6. The optimizer runs once per step, not once per token, and the formula leaves attention out.
 
@@ -77,8 +77,8 @@ The seven questions the course published “as on the test, each with its answer
 - [ ] **C** Its key and value are stored in the cache for later tokens <small>· look in [[2026-11-11 - Training Paradigms II#Excursus – attention cost and the KV cache|TP II · Excursus]]</small>
 - [ ] **D** The keys of earlier tokens are updated to include the new token <small>· look in [[2026-11-11 - Training Paradigms II#Excursus – attention cost and the KV cache|TP II · Excursus]]</small>
 
-> [!success]- Answer: A, B, C
-> A ✓ · B ✓ · C ✓ · D ✗
+> [!success]- Answer (click to open)
+> **A, B, C** · A ✓ · B ✓ · C ✓ · D ✗
 >
 > Earlier tokens are needed only inside attention, through their keys and values. Because of the mask, a token never sees later tokens, so its key and value never change.
 
@@ -94,8 +94,8 @@ The seven questions the course published “as on the test, each with its answer
 - [ ] **C** Without it, the scores grow with the length of the sequence <small>· look in [[2026-10-28 - Theoretical Foundations of Language Modelling#Why divide by √dₖ?|LM · Why divide by √dₖ?]]</small>
 - [ ] **D** Without it, the weights in a row do not add up to 1 <small>· look in [[2026-10-28 - Theoretical Foundations of Language Modelling#Softmax|LM · Softmax]]</small>
 
-> [!success]- Answer: A, B
-> A ✓ · B ✓ · C ✗ · D ✗
+> [!success]- Answer (click to open)
+> **A, B** · A ✓ · B ✓ · C ✗ · D ✗
 >
 > Scores grow with dₖ, the length of q and k, not with the length of the sequence. With large scores, softmax gives one token nearly everything and the rest almost 0, so there is almost no gradient. Dividing keeps the order of the scores; softmax itself makes the weights add up to 1.
 
@@ -111,8 +111,8 @@ The seven questions the course published “as on the test, each with its answer
 - [ ] **C** It keeps the reward model close to its weights from before RL <small>· look in [[2026-11-11 - Training Paradigms II#B4 · RLHF – a reward model|TP II §B4 RLHF]]</small>
 - [ ] **D** It rewards the policy for tokens the reference model finds unlikely <small>· look in [[2026-11-11 - Training Paradigms II#B4 · RLHF – a reward model|TP II §B4 RLHF]]</small>
 
-> [!success]- Answer: A, B
-> A ✓ · B ✓ · C ✗ · D ✗
+> [!success]- Answer (click to open)
+> **A, B** · A ✓ · B ✓ · C ✗ · D ✗
 >
 > If the policy chases the reward model too far, its score keeps rising while the real quality goes up and then down. The KL term pulls the policy back towards the frozen SFT model, harder the further it moves. The reward model does not change during RL.
 
@@ -128,8 +128,8 @@ The seven questions the course published “as on the test, each with its answer
 - [ ] **C** Setting those weights to 0 after the softmax would give the same result <small>· look in [[2026-10-28 - Theoretical Foundations of Language Modelling#Softmax|LM · Softmax]]</small>
 - [ ] **D** Because of the mask, training has to go through the tokens one after the other <small>· look in [[2026-10-28 - Theoretical Foundations of Language Modelling#Masked (causal) attention|LM · Masked]]</small>
 
-> [!success]- Answer: A, B
-> A ✓ · B ✓ · C ✗ · D ✗
+> [!success]- Answer (click to open)
+> **A, B** · A ✓ · B ✓ · C ✗ · D ✗
 >
 > e^−∞ = 0, so the softmax gives later tokens no weight and shares the whole 1 among the tokens up to here. Zeroing the weights after the softmax leaves rows that add up to less than 1. The mask is what lets training run every position at once: each sees exactly what it would see while generating.
 

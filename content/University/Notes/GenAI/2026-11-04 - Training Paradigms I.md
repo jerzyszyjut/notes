@@ -31,6 +31,9 @@ course: Generative AI (194.207)
 
 ## 1 · Architecture – what can be chosen
 
+> [!tip] In plain words
+> The lecture designs a model like an **engineering project with a fixed budget**: 130,000 GPU-hours. Every choice (how big, how wide, how deep, dense or experts, which vocabulary) trades one cost against another. The method: **start small, measure, scale up, repeat**: try ideas on tiny models, keep what works, then spend the big budget once.
+
 | Knob | Options | Pilot's choice |
 |---|---|---|
 | Tokenizer | vocabulary size, language support | ~150k, multilingual |
@@ -47,6 +50,9 @@ course: Generative AI (194.207)
 
 ### 1.1 Scaling laws (Kaplan et al. 2020)
 
+> [!tip] In plain words
+> Bigger model, more data or more compute → lower loss, and the improvement follows a **predictable curve** (a straight line on log–log paper). That predictability is what makes the "start small, measure" method possible: from small runs you can **forecast** the big run, like testing a bridge design on scale models.
+
 Loss falls as a **power law** (a straight line on log–log axes) in compute $C$, data $D$ and non-embedding parameters $N$, as long as the other two don't bottleneck. Bigger models are more **sample-efficient**: they reach a given loss with fewer tokens.
 
 > [!example]- Slide 38 (click to open)
@@ -54,12 +60,18 @@ Loss falls as a **power law** (a straight line on log–log axes) in compute $C$
 
 ### 1.2 Compute-optimal (Chinchilla, Hoffmann et al. 2022)
 
+> [!tip] In plain words
+> With a fixed budget you can buy a bigger model or more training text. Chinchilla found the best mix for the **lowest loss per training FLOP**: grow both together, about **20 tokens of text per parameter**. A huge model trained on too little text is like a giant brain that went to school for a week.
+
 For a fixed compute budget, the best loss comes from scaling $N$ and $D$ **about equally** ($N_{opt}\propto C^{0.49}$, $D_{opt}\propto C^{0.51}$) → rule of thumb **≈ 20 tokens per parameter**. (Dense models.)
 
 > [!example]- Slide 39 (click to open)
 > ![[GenAI-L3-slajd39.png|720]]
 
 ### 1.3 Where C ≈ 6·N·D comes from
+
+> [!tip] In plain words
+> Count the work for **one weight and one token**: going forward, the weight multiplies its input and the result is added up (2 operations). Going backward, the same weight is used twice: once to pass the error to the layer below, once to compute its own correction (2 + 2). Total **6 per weight per token**. Multiply by N weights and D tokens and you have the compute bill. Things that happen once per step (the optimiser) or do not involve weights (comparing tokens in attention) are left out.
 
 One weight $w$, one token. A FLOP = one multiply **or** one add.
 
@@ -83,6 +95,10 @@ With Chinchilla $D\approx20N$: $C\approx120N^2 \Rightarrow N\approx\sqrt{C/120}$
 > ![[GenAI-L3-slajd41.png|720]]
 
 ### 1.4 The pilot's numbers, step by step
+
+> [!tip] In plain words
+> The budget calculation is like converting **working hours into finished products**: GPU-hours × FLOPs per hour × the share of time the GPU really computes (MFU ≈ 35 %) = total FLOPs. Then the rule C ≈ 6ND tells you which (model size, data size) pairs fit.
+> The punchline: the pilot deliberately trains a **smaller model on much more text** than Chinchilla suggests. It costs ~4 % in loss, but the model is 10× smaller, and every later stage (fine-tuning, RL, serving users) becomes ~10× cheaper. Chinchilla only counts the training bill; a real project also pays the running costs.
 
 | Step | Computation | Result |
 |---|---|---|
@@ -108,12 +124,18 @@ With Chinchilla $D\approx20N$: $C\approx120N^2 \Rightarrow N\approx\sqrt{C/120}$
 
 ### 1.5 Width vs depth
 
+> [!tip] In plain words
+> Given a fixed number of parameters you can build a **wide, short** model or a **narrow, tall** one. The loss barely cares as long as the shape is reasonable (width ÷ blocks between about 20 and 250); only extreme shapes hurt, like a building that is one storey high or one room wide.
+
 Loss is nearly flat across shapes as long as **d ÷ blocks ≈ 20–250** (Kaplan Fig. 5). For 2B active and a ~150k vocabulary: 1,024 × 116 blocks (too deep), **2,048 × 24 (chosen, ≈ 85)**, 4,096 × 3 (too wide). $d$ = heads × 128 → 16 heads.
 
 > [!example]- Slide 44 (click to open)
 > ![[GenAI-L3-slajd44.png|720]]
 
 ### 1.6 Dense vs mixture of experts
+
+> [!tip] In plain words
+> A dense model is a **general practitioner**: every token goes through all of it. A mixture of experts is a **hospital with 256 specialists and a receptionist** (router): each token sees one always-on generalist plus the 8 specialists that fit it best. The hospital knows far more (30B parameters in total) but each visit costs only what a 2B model costs. That is why C ≈ 6ND uses the **active** parameters.
 
 | | Dense | MoE (pilot) |
 |---|---|---|
@@ -130,12 +152,18 @@ The trend 2024→2026: **finer** (smaller experts) and **sparser** (higher total
 
 ### 1.7 Tokenizer – what a language costs
 
+> [!tip] In plain words
+> A tokenizer trained mostly on English knows English words as whole pieces but chops other languages into many small fragments. The same sentence in Greek can need 7× as many tokens. More tokens = more compute, higher API bills, less text in the context window. So a multilingual model needs a tokenizer that learned **all** its languages.
+
 **Fertility** = how many tokens a text needs. The same document (UDHR) costs Greek **7.2×**, Bulgarian 6.3×, Polish 3.1×, German 2.3×, French 2.0× as many tokens as English with **GPT-2's English-trained 50k** tokenizer. Better with Qwen3 (152k) and EuroLLM (128k, learned on EU languages). More tokens = more compute per sentence, more cost per API call, less text fits in the context, slower generation → **a multilingual model needs a multilingual tokenizer**.
 
 > [!example]- Slide 49 (click to open)
 > ![[GenAI-L3-slajd49.png|720]]
 
 ### 1.8 What a vocabulary costs
+
+> [!tip] In plain words
+> Every vocabulary entry needs one row in the embedding table and one in the output layer: 2 × V × d weights. For a giant model that is pocket change; for a small 2B model a 150k vocabulary eats almost a third of all parameters. It is like a fixed fee: it hurts small budgets most.
 
 Embedding ($V\times d$) + output layer ($d\times V$) = **$2\cdot V\cdot d$** weights (untied).
 
@@ -153,6 +181,9 @@ Small models pay heavily for big vocabularies; pilot picks ~150k as the multilin
 
 ### 1.9 Images
 
+> [!tip] In plain words
+> Three ways to teach a language model to see: **bolt on** a separately trained eye with an adapter (cheap, most common), **raise them together** from the start (eye and language model trained jointly), or **no separate eye** at all (image patches go straight into the language model). Kimi's experiment: feeding a little image data **from the start** worked better than adding lots of it late.
+
 | Route | Example | + | − |
 |---|---|---|---|
 | **Adapter**: separately trained vision encoder + projector into a finished LM | Qwen2.5-VL, most open models | cheap, reuses two finished models | images join a model built for text |
@@ -169,6 +200,10 @@ Timing (Kimi K2.5): **early, a little at a time** (10% images from start to end)
 ---
 
 ## 2 · Data
+
+> [!tip] In plain words
+> Data work is like **refining crude oil**: the raw web is huge and dirty. Filters throw out junk, deduplication removes copies (so the model does not memorise one page a thousand times), classifiers keep the good and topical parts, and decontamination removes anything that contains exam questions (otherwise the benchmark measures memory, not skill).
+> Then documents are **packed** end to end into fixed-length rows, separated by an end-of-text token, so no compute is wasted on padding. Images enter as placeholder slots that are filled with image vectors and are not predicted.
 
 Knobs: **amount** (how many tokens, do they exist?), **scope** (languages, inputs), **sources**, **cleaning** (filters, dedup, quality classifier), **decontamination**, **mix** (share per source & language), **repeats** (upsampling, rephrasing), **images** (resolution, captions), **tokenizer** (vocab, fertility).
 
@@ -196,6 +231,10 @@ Knobs: **amount** (how many tokens, do they exist?), **scope** (languages, input
 
 ## 3 · Pre-training – one step
 
+> [!tip] In plain words
+> One training step in words: take 1,024 rows of text, let the model guess every next token, measure **how surprised** it was by the true token (−log p: a sure, correct guess costs 0, a 1-in-40,000 guess costs ~10.7), average all those surprises into one number, ask "how should every weight change to lower it?", and move every weight a little in that direction.
+> Two safety belts: **gradient clipping** (if a freak batch produces a huge correction, shorten it but keep its direction) and a **learning-rate schedule** (start gently, go fast, slow down at the end).
+
 ① next batch from the packed dataset → ② forward → ③④ loss → ⑤ update → ⑥ evaluate (now and then).
 
 | Thing | Value |
@@ -222,6 +261,9 @@ Knobs: **amount** (how many tokens, do they exist?), **scope** (languages, input
 > ![[GenAI-L3-slajd78.png|720]]
 
 ### Parallelism – what travels between GPUs
+
+> [!tip] In plain words
+> Many GPUs work on one model like **a team building cars**: data parallel = several identical factories, each building different cars, comparing notes once a day (gradients); tensor parallel = several workers on the same part at once, constantly passing pieces; pipeline = an **assembly line**, each GPU does some layers and passes the half-finished product on; expert parallel = each GPU is a specialist workshop and the tokens travel to them.
 
 | Strategy | Split | What travels |
 |---|---|---|
@@ -265,8 +307,8 @@ for step, batch in enumerate(loader):
 - [ ] **C** Optimizer step: two more operations for each weight and token <small>· look in [[2026-11-04 - Training Paradigms I#1.3 Where C ≈ 6·N·D comes from|TP I §1.3 Where C ≈ 6·N·D comes from]]</small>
 - [ ] **D** Attention: two more operations for comparing the tokens <small>· look in [[2026-11-04 - Training Paradigms I#1.3 Where C ≈ 6·N·D comes from|TP I §1.3 Where C ≈ 6·N·D comes from]]</small>
 
-> [!success]- Answer: A, B
-> A ✓ · B ✓ · C ✗ · D ✗
+> [!success]- Answer (click to open)
+> **A, B** · A ✓ · B ✓ · C ✗ · D ✗
 >
 > Forward: 2 operations for each weight and token. Backward: 4. Together: 6. The optimizer runs once per step, not once per token, and the formula leaves attention out.
 
@@ -279,8 +321,8 @@ for step, batch in enumerate(loader):
 - [ ] **C** 4,096 × 3 blocks would be too deep <small>· look in [[2026-11-04 - Training Paradigms I#1.5 Width vs depth|TP I §1.5 Width vs depth]]</small>
 - [ ] **D** Inside that range, loss changes by only about 1 % <small>· look in [[2026-11-04 - Training Paradigms I#1.5 Width vs depth|TP I §1.5 Width vs depth]]</small>
 
-> [!success]- Answer: A, B, D
-> A ✓ · B ✓ · C ✗ · D ✓
+> [!success]- Answer (click to open)
+> **A, B, D** · A ✓ · B ✓ · C ✗ · D ✓
 >
 > 2,048 / 24 ≈ 85; 2,048 / 16 = 128. 4,096 × 3 is too wide, 1,024 × 116 too deep (Kaplan Fig. 5, EuroLLM-1.7B’s shape).
 
@@ -293,8 +335,8 @@ for step, batch in enumerate(loader):
 - [ ] **C** A tokenizer trained on EU languages reduces the factor <small>· look in [[2026-11-04 - Training Paradigms I#1.7 Tokenizer – what a language costs|TP I §1.7 Tokenizer]]</small>
 - [ ] **D** Training longer removes the problem <small>· look in [[2026-11-04 - Training Paradigms I#1.7 Tokenizer – what a language costs|TP I §1.7 Tokenizer]]</small>
 
-> [!success]- Answer: A, B, C
-> A ✓ · B ✓ · C ✓ · D ✗
+> [!success]- Answer (click to open)
+> **A, B, C** · A ✓ · B ✓ · C ✓ · D ✗
 >
 > Fertility is a property of the tokenizer, fixed before training. More tokens per sentence means more compute, higher API cost, shorter effective context and slower generation.
 
@@ -307,8 +349,8 @@ for step, batch in enumerate(loader):
 - [ ] **C** Every document must be exactly 4,096 tokens long <small>· look in [[2026-11-04 - Training Paradigms I#2 · Data|TP I §2 Data]]</small>
 - [ ] **D** Every document is followed by <|endoftext|> <small>· look in [[2026-11-04 - Training Paradigms I#2 · Data|TP I §2 Data]]</small>
 
-> [!success]- Answer: B, D
-> A ✗ · B ✓ · C ✗ · D ✓
+> [!success]- Answer (click to open)
+> **B, D** · A ✗ · B ✓ · C ✗ · D ✓
 >
 > Join all documents, each ended with <|endoftext|> (151643), and cut into rows: 0 % waste vs 44 % with padding. A long document is cut across rows.
 
@@ -321,8 +363,8 @@ for step, batch in enumerate(loader):
 - [ ] **C** ηₜ comes from the learning-rate schedule, e.g. warmup, plateau, decay <small>· look in [[2026-11-04 - Training Paradigms I#3 · Pre-training – one step|TP I §3 Pre-training]]</small>
 - [ ] **D** AdamW smooths the gradient and sizes the step per weight <small>· look in [[2026-11-04 - Training Paradigms I#3 · Pre-training – one step|TP I §3 Pre-training]]</small>
 
-> [!success]- Answer: C, D
-> A ✗ · B ✗ · C ✓ · D ✓
+> [!success]- Answer (click to open)
+> **C, D** · A ✗ · B ✗ · C ✓ · D ✓
 >
 > Optimiser (Δ): one batch’s gradient is noisy and badly scaled → smooth it (momentum) and size it per weight (AdamW, Muon). Scheduler (η): start gently, go big, end small.
 
@@ -335,8 +377,8 @@ for step, batch in enumerate(loader):
 - [ ] **C** Adding images late in training (50 % in the last fifth) scored best in Kimi K2.5’s comparison <small>· look in [[2026-11-04 - Training Paradigms I#1.9 Images|TP I §1.9 Images]]</small>
 - [ ] **D** An adapter joins a separately trained vision encoder to a finished language model through a projector <small>· look in [[2026-11-04 - Training Paradigms I#1.9 Images|TP I §1.9 Images]]</small>
 
-> [!success]- Answer: D
-> A ✗ · B ✗ · C ✗ · D ✓
+> [!success]- Answer (click to open)
+> **D** · A ✗ · B ✗ · C ✗ · D ✓
 >
 > Adapter (Qwen2.5-VL): cheap, but images join a model built for text. Native with encoder (Kimi K3): learn together, one big joint run. Native without encoder (Fuyu-8B): simplest, less proven. Early, a little at a time (10 %) was best on images and on text.
 
@@ -349,8 +391,8 @@ for step, batch in enumerate(loader):
 - [ ] **C** Loss falls in a straight line against compute on normal (linear) axes <small>· look in [[2026-11-04 - Training Paradigms I#1.1 Scaling laws (Kaplan et al. 2020)|TP I §1.1 Scaling laws]]</small>
 - [ ] **D** The power law holds even when data is the bottleneck <small>· look in [[2026-11-04 - Training Paradigms I#1.1 Scaling laws (Kaplan et al. 2020)|TP I §1.1 Scaling laws]]</small>
 
-> [!success]- Answer: A, B
-> A ✓ · B ✓ · C ✗ · D ✗
+> [!success]- Answer (click to open)
+> **A, B** · A ✓ · B ✓ · C ✗ · D ✗
 >
 > A power law is a straight line on log–log axes. It holds as long as neither of the other two factors bottlenecks. Bigger models are more sample-efficient.
 
@@ -363,8 +405,8 @@ for step, batch in enumerate(loader):
 - [ ] **C** FSDP never moves weights between GPUs <small>· look in [[2026-11-04 - Training Paradigms I#Parallelism – what travels between GPUs|TP I · Parallelism]]</small>
 - [ ] **D** Data parallel gives each GPU a different part of the model <small>· look in [[2026-11-04 - Training Paradigms I#Parallelism – what travels between GPUs|TP I · Parallelism]]</small>
 
-> [!success]- Answer: A, B
-> A ✓ · B ✓ · C ✗ · D ✗
+> [!success]- Answer (click to open)
+> **A, B** · A ✓ · B ✓ · C ✗ · D ✗
 >
 > FSDP gathers each layer’s weights when needed and frees them again. Data parallel copies the whole model and splits the rows.
 

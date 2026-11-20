@@ -25,8 +25,8 @@ course: Generative AI (194.207)
 - [ ] **C** A generative model can produce new examples that look like its training data <small>· look in [[2026-10-21 - Introduction to Generative AI#2 · Discriminative vs generative|Intro §2 Discriminative vs generative]]</small>
 - [ ] **D** A discriminative model learns p(y | x), e.g. how likely “cow” is given a picture <small>· look in [[2026-10-21 - Introduction to Generative AI#2 · Discriminative vs generative|Intro §2 Discriminative vs generative]]</small>
 
-> [!success]- Answer: C, D
-> A ✗ · B ✗ · C ✓ · D ✓
+> [!success]- Answer (click to open)
+> **C, D** · A ✗ · B ✗ · C ✓ · D ✓
 >
 > Discriminative models learn where one class ends and the next begins, so they need examples of both classes. Generative models learn p(x), the shape of the data itself, and can sample from it. A random forest learns its splits from data: subsymbolic.
 
@@ -42,8 +42,8 @@ course: Generative AI (194.207)
 - [ ] **C** p(moo | cow) = 14 % <small>· look in [[2026-10-21 - Introduction to Generative AI#3 · Joint, conditional, marginal|Intro §3 Joint, conditional, marginal]]</small>
 - [ ] **D** p(moo) = 16 % <small>· look in [[2026-10-21 - Introduction to Generative AI#3 · Joint, conditional, marginal|Intro §3 Joint, conditional, marginal]]</small>
 
-> [!success]- Answer: A, D
-> A ✓ · B ✗ · C ✗ · D ✓
+> [!success]- Answer (click to open)
+> **A, D** · A ✓ · B ✗ · C ✗ · D ✓
 >
 > Marginal: sum the column, 14 + 1 + 1 = 16 %. Conditional: 14 / 16 = 87.5 %. p(moo | cow) = 14 / 40 = 35 %. p(cow) · p(moo) = 6.4 % ≠ 14 %: animal and sound are not independent.
 
@@ -59,8 +59,8 @@ course: Generative AI (194.207)
 - [ ] **C** Generation starts from pure noise and removes predicted noise over many steps <small>· look in [[2026-10-21 - Introduction to Generative AI#5 · Diffusion – all at once|Intro §5 Diffusion]]</small>
 - [ ] **D** The noise added during training is produced by the network itself <small>· look in [[2026-10-21 - Introduction to Generative AI#5 · Diffusion – all at once|Intro §5 Diffusion]]</small>
 
-> [!success]- Answer: A, C
-> A ✓ · B ✗ · C ✓ · D ✗
+> [!success]- Answer (click to open)
+> **A, C** · A ✓ · B ✗ · C ✓ · D ✗
 >
 > Forward diffusion draws noise and mixes it in (nothing learned); the network predicts that noise. Backward diffusion starts from noise and subtracts a little predicted noise each step (e.g. 50). Every pixel is updated at every step: all at once, not piece by piece.
 
@@ -76,8 +76,8 @@ course: Generative AI (194.207)
 - [ ] **C** There is one row per token ID in the vocabulary <small>· look in [[2026-10-28 - Theoretical Foundations of Language Modelling#1 · Embedding|LM §1 Embedding]]</small>
 - [ ] **D** Looking up ·cow returns row 19362, the same vector in every sentence <small>· look in [[2026-10-21 - Introduction to Generative AI#7 · Embeddings (start of Language modelling)|Intro §7 Embeddings]]</small>
 
-> [!success]- Answer: C, D
-> A ✗ · B ✗ · C ✓ · D ✓
+> [!success]- Answer (click to open)
+> **C, D** · A ✗ · B ✗ · C ✓ · D ✓
 >
 > The embedding is a lookup: token ID → row. It is learned like every other weight. Real dimensions have no names; the animal / royalty columns on the slide were an illustration.
 
@@ -93,8 +93,8 @@ course: Generative AI (194.207)
 - [ ] **C** For dₖ = 256 the matching divisor would be 16 <small>· look in [[2026-10-28 - Theoretical Foundations of Language Modelling#Why divide by √dₖ?|LM · Why divide by √dₖ?]]</small>
 - [ ] **D** After the softmax, the weights in each row still add up to 1 <small>· look in [[2026-10-28 - Theoretical Foundations of Language Modelling#Softmax|LM · Softmax]]</small>
 
-> [!success]- Answer: B, C, D
-> A ✗ · B ✓ · C ✓ · D ✓
+> [!success]- Answer (click to open)
+> **B, C, D** · A ✗ · B ✓ · C ✓ · D ✓
 >
 > If q and k have entries of variance 1, q · k has variance dₖ, so its spread grows like √dₖ; dividing by √dₖ undoes that (√256 = 16). Dividing by a positive constant keeps the order of the scores; softmax makes the row sum to 1.
 
@@ -110,8 +110,8 @@ course: Generative AI (194.207)
 - [ ] **C** The prediction at position 10 may use token 11 <small>· look in [[2026-10-28 - Theoretical Foundations of Language Modelling#Masked (causal) attention|LM · Masked]]</small>
 - [ ] **D** All 4,096 next-token predictions of a row are computed in one forward pass <small>· look in [[2026-10-28 - Theoretical Foundations of Language Modelling#Masked (causal) attention|LM · Masked]]</small>
 
-> [!success]- Answer: A, D
-> A ✓ · B ✗ · C ✗ · D ✓
+> [!success]- Answer (click to open)
+> **A, D** · A ✓ · B ✗ · C ✗ · D ✓
 >
 > The mask puts −∞ above the diagonal, so each position sees exactly what it would see while generating. That is what makes it safe to compute every position in parallel. Position 1 has only itself to look at.
 
@@ -127,8 +127,8 @@ course: Generative AI (194.207)
 - [ ] **C** Every pair of dimensions turns by the same angle per position <small>· look in [[2026-10-28 - Theoretical Foundations of Language Modelling#RoPE in detail|LM · RoPE in detail]]</small>
 - [ ] **D** The rotation vector is added once to the embeddings, before the first block <small>· look in [[2026-10-28 - Theoretical Foundations of Language Modelling#RoPE in detail|LM · RoPE in detail]]</small>
 
-> [!success]- Answer: A, B
-> A ✓ · B ✓ · C ✗ · D ✗
+> [!success]- Answer (click to open)
+> **A, B** · A ✓ · B ✓ · C ✗ · D ✗
 >
 > (R(m)q)ᵀ(R(n)k) = qᵀR(n − m)k: a relative score. RoPE is applied to q and k inside every attention layer, not added at the input. Each pair has its own speed θᵢ = b^(−2(i−1)/d): fast pairs for nearby order, slow pairs for long distances.
 
@@ -144,8 +144,8 @@ course: Generative AI (194.207)
 - [ ] **C** μ is the mean over all tokens in the batch <small>· look in [[2026-10-28 - Theoretical Foundations of Language Modelling#5 · Add & Norm – keeping it trainable|LM §5 Add & Norm]]</small>
 - [ ] **D** μ and σ² are computed over the d numbers of one token’s vector <small>· look in [[2026-10-28 - Theoretical Foundations of Language Modelling#5 · Add & Norm – keeping it trainable|LM §5 Add & Norm]]</small>
 
-> [!success]- Answer: A, D
-> A ✓ · B ✗ · C ✗ · D ✓
+> [!success]- Answer (click to open)
+> **A, D** · A ✓ · B ✗ · C ✗ · D ✓
 >
 > LayerNorm normalises each token’s own vector. ε ≈ 10⁻⁶ only avoids dividing by 0; β is the learned shift. γ and β start at 1 and 0 and are learned per dimension.
 
@@ -161,8 +161,8 @@ course: Generative AI (194.207)
 - [ ] **C** The training compute is about 6 · 2B · 4T ≈ 4.8 · 10²² FLOPs <small>· look in [[2026-11-04 - Training Paradigms I#1.6 Dense vs mixture of experts|TP I §1.6 Dense vs mixture of experts]]</small>
 - [ ] **D** The 6 includes two operations per weight for the optimizer step <small>· look in [[2026-11-04 - Training Paradigms I#1.3 Where C ≈ 6·N·D comes from|TP I §1.3 Where C ≈ 6·N·D comes from]]</small>
 
-> [!success]- Answer: A, C
-> A ✓ · B ✗ · C ✓ · D ✗
+> [!success]- Answer (click to open)
+> **A, C** · A ✓ · B ✗ · C ✓ · D ✗
 >
 > N counts the parameters a token is multiplied with: in a MoE, the active ones. 6 = 2 forward + 4 backward per weight and token; the optimizer runs once per step, not per token. The formula leaves attention scores out.
 
@@ -178,8 +178,8 @@ course: Generative AI (194.207)
 - [ ] **C** Both choices need roughly the same training compute <small>· look in [[2026-11-04 - Training Paradigms I#1.4 The pilot's numbers, step by step|TP I §1.4 The pilot's numbers, step by step]]</small>
 - [ ] **D** Everything after pre-training (fine-tuning, RL, inference) becomes roughly ten times cheaper <small>· look in [[2026-11-04 - Training Paradigms I#1.4 The pilot's numbers, step by step|TP I §1.4 The pilot's numbers, step by step]]</small>
 
-> [!success]- Answer: C, D
-> A ✗ · B ✗ · C ✓ · D ✓
+> [!success]- Answer (click to open)
+> **C, D** · A ✗ · B ✗ · C ✓ · D ✓
 >
 > 6 · 20B · 0.4T = 6 · 2B · 4T = 4.8 · 10²². The smaller model pays about +4 % loss but is 10× smaller, so all later stages cost a tenth. Chinchilla: about 20 tokens per parameter.
 
@@ -195,8 +195,8 @@ course: Generative AI (194.207)
 - [ ] **C** That is roughly 30 % of the active parameters <small>· look in [[2026-11-04 - Training Paradigms I#1.8 What a vocabulary costs|TP I §1.8 What a vocabulary costs]]</small>
 - [ ] **D** For a frontier model with d = 7,168 and 70B active, the same vocabulary is only about 3 % <small>· look in [[2026-11-04 - Training Paradigms I#1.8 What a vocabulary costs|TP I §1.8 What a vocabulary costs]]</small>
 
-> [!success]- Answer: A, C, D
-> A ✓ · B ✗ · C ✓ · D ✓
+> [!success]- Answer (click to open)
+> **A, C, D** · A ✓ · B ✗ · C ✓ · D ✓
 >
 > 2 · 150k · 2,048 ≈ 0.61B, ≈ 30 % of 2B; 2 · 150k · 7,168 ≈ 2.2B ≈ 3 % of 70B. A smaller or English-centred vocabulary splits Greek into many more tokens (7.2× with GPT-2’s), which costs more compute per sentence.
 
@@ -212,8 +212,8 @@ course: Generative AI (194.207)
 - [ ] **C** The model learns to predict the image patches as its next tokens <small>· look in [[2026-11-04 - Training Paradigms I#2 · Data|TP I §2 Data]]</small>
 - [ ] **D** The vision encoder’s vectors overwrite the embeddings at the slot positions <small>· look in [[2026-11-04 - Training Paradigms I#2 · Data|TP I §2 Data]]</small>
 
-> [!success]- Answer: A, B, D
-> A ✓ · B ✓ · C ✗ · D ✓
+> [!success]- Answer (click to open)
+> **A, B, D** · A ✓ · B ✓ · C ✗ · D ✓
 >
 > 448 / 14 = 32, so 32 × 32 = 1,024 patches; 2 × 2 per slot gives 256. masked_scatter fills the slots with the image vectors. The image is input only: −100 is PyTorch’s ignore label.
 
@@ -229,8 +229,8 @@ course: Generative AI (194.207)
 - [ ] **C** Decoding speed is limited mostly by reading weights and cache from memory <small>· look in [[2026-11-11 - Training Paradigms II#Excursus – attention cost and the KV cache|TP II · Excursus]]</small>
 - [ ] **D** The cache grows by 2 · 24 · 16 · 128 · 2 bytes (≈ 192 KiB) per token <small>· look in [[2026-11-11 - Training Paradigms II#Excursus – attention cost and the KV cache|TP II · Excursus]]</small>
 
-> [!success]- Answer: A, C, D
-> A ✓ · B ✗ · C ✓ · D ✓
+> [!success]- Answer (click to open)
+> **A, C, D** · A ✓ · B ✗ · C ✓ · D ✓
 >
 > 2 for K and V × layers × KV heads × head size × bytes. GQA with 4 KV heads instead of 16 shrinks it 4×. Decoding reads all weights and the whole cache for each new token: memory-bound. Prefill reads the whole prompt in parallel.
 
@@ -246,8 +246,8 @@ course: Generative AI (194.207)
 - [ ] **C** DPO needs a separately trained reward model <small>· look in [[2026-11-11 - Training Paradigms II#B2 · DPO – pairs, one better|TP II §B2 DPO]]</small>
 - [ ] **D** The loss is −log σ(0.4) ≈ 0.51 <small>· look in [[2026-11-11 - Training Paradigms II#B2 · DPO – pairs, one better|TP II §B2 DPO]]</small>
 
-> [!success]- Answer: A, D
-> A ✓ · B ✗ · C ✗ · D ✓
+> [!success]- Answer (click to open)
+> **A, D** · A ✓ · B ✗ · C ✗ · D ✓
 >
 > gain⁻ = (−37) − (−35) = −2, so 0.1 · [2 − (−2)] = 0.4; σ(0.4) ≈ 0.60, −log 0.60 ≈ 0.51 < 0.69. DPO compares each answer with the frozen reference, not absolute log-probs. It needs no reward model and no sampling.
 
@@ -263,8 +263,8 @@ course: Generative AI (194.207)
 - [ ] **C** If the policy were identical to the reference, the KL would be 0 <small>· look in [[2026-11-11 - Training Paradigms II#B4 · RLHF – a reward model|TP II §B4 RLHF]]</small>
 - [ ] **D** A larger β lets the policy drift further from the reference <small>· look in [[2026-11-11 - Training Paradigms II#B4 · RLHF – a reward model|TP II §B4 RLHF]]</small>
 
-> [!success]- Answer: B, C
-> A ✗ · B ✓ · C ✓ · D ✗
+> [!success]- Answer (click to open)
+> **B, C** · A ✗ · B ✓ · C ✓ · D ✗
 >
 > 0.8 − 0.1 · 1.5 = 0.65. KL = Σ p_policy (log p_policy − log p_ref) is 0 only for identical distributions. The reward model is frozen during RL; a larger β pulls harder towards the reference.
 
@@ -280,8 +280,8 @@ course: Generative AI (194.207)
 - [ ] **C** The best answer’s advantage is about +1.45 <small>· look in [[2026-11-11 - Training Paradigms II#B8 · GRPO (DeepSeekMath)|TP II §B8 GRPO]]</small>
 - [ ] **D** All tokens of the first answer get the same advantage <small>· look in [[2026-11-11 - Training Paradigms II#B8 · GRPO (DeepSeekMath)|TP II §B8 GRPO]]</small>
 
-> [!success]- Answer: A, C, D
-> A ✓ · B ✗ · C ✓ · D ✓
+> [!success]- Answer (click to open)
+> **A, C, D** · A ✓ · B ✗ · C ✓ · D ✓
 >
 > A = (r − mean) / std: (0.8 − 0.425) / 0.259 ≈ +1.45; (0.3 − 0.425) / 0.259 ≈ −0.48 < 0. GRPO gives every token of an answer its A. The group mean is the baseline: no value model (PPO’s Vₜ).
 
@@ -297,8 +297,8 @@ course: Generative AI (194.207)
 - [ ] **C** With the provider’s prefix cache, the app no longer needs to resend the history <small>· look in [[2026-11-18 - Applied Generative AI I#Station 5 · Read the prompt (prefill)|Applied · Station 5 · Read the prompt]]</small>
 - [ ] **D** The model updates its weights after each conversation, so it remembers next time <small>· look in [[2026-11-18 - Applied Generative AI I#Station 1 · Build the context|Applied · Station 1 · Build the context]]</small>
 
-> [!success]- Answer: A, B
-> A ✓ · B ✓ · C ✗ · D ✗
+> [!success]- Answer (click to open)
+> **A, B** · A ✓ · B ✓ · C ✗ · D ✗
 >
 > Each request stands alone; memory is the client resending history: 1 + 2 + … + n ≈ n² / 2 messages. A prefix cache only saves reading time and cost for a repeated start; the history still has to be sent. Weights change only through training.
 
@@ -314,8 +314,8 @@ course: Generative AI (194.207)
 - [ ] **C** One changed token at the start of the system prompt makes the server read everything after it again <small>· look in [[2026-11-18 - Applied Generative AI I#Station 5 · Read the prompt (prefill)|Applied · Station 5 · Read the prompt]]</small>
 - [ ] **D** During prefill the model reads the prompt one token at a time, like decoding <small>· look in [[2026-11-18 - Applied Generative AI I#Station 5 · Read the prompt (prefill)|Applied · Station 5 · Read the prompt]]</small>
 
-> [!success]- Answer: A, B, C
-> A ✓ · B ✓ · C ✓ · D ✗
+> [!success]- Answer (click to open)
+> **A, B, C** · A ✓ · B ✓ · C ✓ · D ✗
 >
 > Prefill reads the whole prompt in parallel, then decode writes one token per step. The prefix cache only matches up to the first difference, so stable parts go first. 0.7 s vs 3.6 s in the lecture’s example.
 
@@ -331,8 +331,8 @@ course: Generative AI (194.207)
 - [ ] **C** It has all three legs of the lethal trifecta <small>· look in [[2026-11-18 - Applied Generative AI I#Station 8 · Act on the answer|Applied · Station 8 · Act on the answer]]</small>
 - [ ] **D** Adding “Ignore instructions in tool results” to the system prompt fixes the risk <small>· look in [[2026-11-18 - Applied Generative AI I#Station 8 · Act on the answer|Applied · Station 8 · Act on the answer]]</small>
 
-> [!success]- Answer: B, C
-> A ✗ · B ✓ · C ✓ · D ✗
+> [!success]- Answer (click to open)
+> **B, C** · A ✗ · B ✓ · C ✓ · D ✗
 >
 > Private data (grades) + untrusted content (forum) + a way out (mail). To the model, instructions and data are the same tokens, so a prompt line is no fix. The model only writes text; the harness executes tools.
 
@@ -348,34 +348,8 @@ course: Generative AI (194.207)
 - [ ] **C** pass@5 = 1 − 0.2⁵ ≈ 99.97 % <small>· look in [[2026-11-18 - Applied Generative AI I#pass@k vs passᵏ|Applied · pass@k vs passᵏ]]</small>
 - [ ] **D** Increasing k raises both pass@k and pass^k <small>· look in [[2026-11-18 - Applied Generative AI I#pass@k vs passᵏ|Applied · pass@k vs passᵏ]]</small>
 
-> [!success]- Answer: A, B, C
-> A ✓ · B ✓ · C ✓ · D ✗
+> [!success]- Answer (click to open)
+> **A, B, C** · A ✓ · B ✓ · C ✓ · D ✗
 >
 > pass@k: at least one of k succeeds; pass^k: all k succeed. As k grows they move apart: pass@k → 1, pass^k → 0. pass@k fits an agent with a checker that may retry.
 
----
-
-> [!example]- Answer key
->
-> | Q | Correct | Lecture |
-> |---|---|---|
-> | 1 | C, D | Introduction to Generative AI |
-> | 2 | A, D | Introduction to Generative AI |
-> | 3 | A, C | Introduction to Generative AI |
-> | 4 | C, D | Theoretical Foundations of Language Modelling |
-> | 5 | B, C, D | Theoretical Foundations of Language Modelling |
-> | 6 | A, D | Theoretical Foundations of Language Modelling |
-> | 7 | A, B | Theoretical Foundations of Language Modelling |
-> | 8 | A, D | Theoretical Foundations of Language Modelling |
-> | 9 | A, C | Training Paradigms I |
-> | 10 | C, D | Training Paradigms I |
-> | 11 | A, C, D | Training Paradigms I |
-> | 12 | A, B, D | Training Paradigms I |
-> | 13 | A, C, D | Training Paradigms II |
-> | 14 | A, D | Training Paradigms II |
-> | 15 | B, C | Training Paradigms II |
-> | 16 | A, C, D | Training Paradigms II |
-> | 17 | A, B | Applied Generative AI I |
-> | 18 | A, B, C | Applied Generative AI I |
-> | 19 | B, C | Applied Generative AI I |
-> | 20 | A, B, C | Applied Generative AI I |

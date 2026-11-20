@@ -40,6 +40,11 @@ course: Generative AI (194.207)
 
 ## 1 · Symbolic vs subsymbolic
 
+> [!tip] In plain words
+> Two ways to make a machine recognise a cow. **Symbolic** = you write the recipe yourself: "if it has horns, an udder, hooves and a tail, it is a cow". You can read every rule, and you can fix a mistake by editing a line. But the recipe only knows what you thought of: a cow whose horns were removed fails the test, and a female goat passes it.
+> **Subsymbolic** = you show the machine thousands of pictures labelled cow / not cow and let it adjust millions of numbers until it gets them right. Nobody can read those numbers, and you cannot "edit the rule" because there is no rule: you can only change the training data and train again. In exchange it handles cases nobody wrote down.
+> Think: **a rule book written by a person** vs **an experienced farmer's gut feeling**.
+
 | | Symbolic AI | Subsymbolic AI (machine learning) |
 |---|---|---|
 | Knowledge comes from | people writing explicit rules over formal symbols | examples (data) |
@@ -65,6 +70,11 @@ course: Generative AI (194.207)
 
 ## 2 · Discriminative vs generative
 
+> [!tip] In plain words
+> A **discriminative** model is a judge: given a picture, it says "cow, 90 %". It only learns where the border between cow and not-cow runs, so it needs examples from both sides of the border.
+> A **generative** model is an artist: it learns what cow pictures look like in general, so it can **draw a new one**, and also say how typical a given picture is. It only needs examples of the thing it should make.
+> The artist can play judge (with Bayes: how well does this picture fit "cow" vs "dog"?), but the judge can never draw. All of generative AI is the artist side.
+
 | | Discriminative | Generative |
 |---|---|---|
 | Learns | $p(y\mid x)$: which output goes with an input; **where one class ends and the next begins** (decision boundary) | $p(x)$ (or $p(x,y)$): **what the data itself looks like**, its natural shape |
@@ -86,6 +96,13 @@ The goal of both: approximate the true distribution, $p_\theta(y\mid x)\approx p
 ---
 
 ## 3 · Joint, conditional, marginal
+
+> [!tip] In plain words
+> Picture the farm table as **100 days of notes**: each day you wrote down which animal you met and what sound it made.
+> - **Joint** p(cow, moo) = on how many of the 100 days did you see a cow *and* hear moo? 14.
+> - **Marginal** p(moo) = forget the animal, on how many days did you hear moo at all? Add the column: 14 + 1 + 1 = 16.
+> - **Conditional** p(cow | moo) = only look at the 16 moo-days; on how many was it a cow? 14 of 16 = 87.5 %. "Given" always means: **shrink the world to the part you know is true, and divide by its size**.
+> This "shrink and divide" move comes back in softmax and in constrained decoding.
 
 The farm table from the site (Fig. 12), $p(\text{animal},\text{sound})$:
 
@@ -113,6 +130,10 @@ The farm table from the site (Fig. 12), $p(\text{animal},\text{sound})$:
 
 ## 4 · Autoregressive – piece by piece
 
+> [!tip] In plain words
+> Like writing a sentence one word at a time where every word may depend on everything already written. The chain rule says this is not a trick or an approximation: the probability of a whole sentence is **exactly** the probability of word 1, times word 2 given word 1, times word 3 given words 1–2, and so on.
+> So one question is enough for the model to learn: **"given everything so far, what comes next?"** Generation is a loop: ask, draw one token, glue it on, ask again. Once written, a token stays.
+
 Apply the product rule again and again → **chain rule**:
 
 $$p(x_1,\dots,x_T)=\prod_{t=1}^{T} p(x_t \mid x_{<t}) = p(x_1)\,p(x_2\mid x_1)\,p(x_3\mid x_1,x_2)\cdots$$
@@ -135,6 +156,10 @@ Generation = draw token → append → ask again (Fig. 14 on the site lets you p
 
 ## 5 · Diffusion – all at once
 
+> [!tip] In plain words
+> Think of **restoring a photo hidden under static**. For training you take clean photos and sprinkle known noise on them (from a little to a lot); the network's only job is to **guess which noise was added**. That is easy to check because you added it yourself.
+> To create a picture you start with pure static and repeat: "guess the noise, remove a bit of it". After ~50 such steps a picture appears. Unlike autoregression, **every pixel is improved at every step**, so early mistakes can still be repaired.
+
 | | What happens | Who does what |
 |---|---|---|
 | **Forward diffusion** (training data) | take a clean example, draw noise $\epsilon$, mix in an amount set by noise level $t$ → noisy example | fixed procedure, nothing learned |
@@ -154,6 +179,13 @@ Noise "type" per modality: Gaussian noise for pixels/sound/video; **masks** for 
 ---
 
 ## 6 · Tokens for every modality
+
+> [!tip] In plain words
+> A network only eats numbers, so every kind of data is first cut into pieces and each piece becomes a number or vector:
+> - **Text → BPE tokens**: start with the 256 possible bytes, then keep gluing the most frequent neighbouring pair into a new token ("t"+"h" → "th", "th"+"e" → "the"). Common words become one token, rare words fall apart into smaller pieces, so **no word is ever unknown**.
+> - **Pictures → patches**: cut the image into small squares like **tiles**, flatten each tile, and turn it into a vector with one shared matrix; a position vector says where the tile was.
+> - **Sound → windows**: cut the wave into short slices; an encoder turns each slice into a vector.
+> A token ID is like a **locker number**: 19362 says where to find ·cow, not what a cow is.
 
 | Modality | Unit | How it becomes a token | Variables |
 |---|---|---|---|
@@ -187,6 +219,11 @@ Noise "type" per modality: Gaussian noise for pixels/sound/video; **masks** for 
 ---
 
 ## 7 · Embeddings (start of Language modelling)
+
+> [!tip] In plain words
+> The embedding table is a **dictionary where every token has a list of 1,024 numbers instead of a definition**. Looking up a token = reading its row.
+> Training places the rows so that tokens used in similar company end up close together (cow near cows, king − man + woman near queen). The individual numbers have no names; only **closeness and directions** mean something.
+> Important: the lookup is **the same in every sentence**. "bank" gets the same row next to "river" and next to "money". The difference appears only later, when attention lets "bank" look at its neighbours.
 
 - **Embedding table**: 151,936 rows (one per token ID) × 1,024 learned numbers (Qwen3-0.6B). Looking up `·cow` = taking **row 19362**; in code `table(torch.tensor([19362]))` equals `table.weight[19362]`.
 - Dimensions have **no names** in a real model (the "animal / royalty / dairy" columns are an illustration).
@@ -228,8 +265,8 @@ Noise "type" per modality: Gaussian noise for pixels/sound/video; **masks** for 
 - [ ] **C** After positional encoding, the two ·bank vectors are different <small>· look in [[2026-10-28 - Theoretical Foundations of Language Modelling#3 · Position – attention alone has no order|LM §3 Position]]</small>
 - [ ] **D** The feed-forward layers add meaning from the neighbouring words <small>· look in [[2026-10-28 - Theoretical Foundations of Language Modelling#4 · Feed-forward – knowledge|LM §4 Feed-forward]]</small>
 
-> [!success]- Answer: A, B
-> A ✓ · B ✓ · C ✗ · D ✗
+> [!success]- Answer (click to open)
+> **A, B** · A ✓ · B ✓ · C ✗ · D ✗
 >
 > The embedding is a lookup: the same token always gets the same row. ·bank is the third token in both, so its position is the same too. Only attention mixes tokens; the feed-forward looks at each token alone.
 
@@ -242,8 +279,8 @@ Noise "type" per modality: Gaussian noise for pixels/sound/video; **masks** for 
 - [ ] **C** Each merge adds the most frequent adjacent pair as a new token <small>· look in [[2026-10-21 - Introduction to Generative AI#6 · Tokens for every modality|Intro §6 Tokens for every modality]]</small>
 - [ ] **D** A word never seen in training cannot be tokenized <small>· look in [[2026-10-21 - Introduction to Generative AI#6 · Tokens for every modality|Intro §6 Tokens for every modality]]</small>
 
-> [!success]- Answer: B, C
-> A ✗ · B ✓ · C ✓ · D ✗
+> [!success]- Answer (click to open)
+> **B, C** · A ✗ · B ✓ · C ✓ · D ✗
 >
 > Start from 256 bytes, repeatedly merge the most frequent pair (256 ·c, 257 he, 258 the …), then add special tokens. Unseen words fall back to smaller pieces. An ID is an address, not a meaning.
 
@@ -256,8 +293,8 @@ Noise "type" per modality: Gaussian noise for pixels/sound/video; **masks** for 
 - [ ] **C** xᵢ has 192 numbers <small>· look in [[2026-10-21 - Introduction to Generative AI#6 · Tokens for every modality|Intro §6 Tokens for every modality]]</small>
 - [ ] **D** Each patch position has its own matrix W <small>· look in [[2026-10-21 - Introduction to Generative AI#6 · Tokens for every modality|Intro §6 Tokens for every modality]]</small>
 
-> [!success]- Answer: A, C
-> A ✓ · B ✗ · C ✓ · D ✗
+> [!success]- Answer (click to open)
+> **A, C** · A ✓ · B ✗ · C ✓ · D ✗
 >
 > 8 · 8 · 3 = 192. One learned W ∈ ℝ^(d×192) is shared by all patches; the position comes from pᵢ. Snapping to a codebook ID is optional; continuous vectors can go straight in.
 
@@ -270,8 +307,8 @@ Noise "type" per modality: Gaussian noise for pixels/sound/video; **masks** for 
 - [ ] **C** Diffusion updates every piece at every step <small>· look in [[2026-10-21 - Introduction to Generative AI#5 · Diffusion – all at once|Intro §5 Diffusion]]</small>
 - [ ] **D** Autoregressive models cannot generate pictures <small>· look in [[2026-10-21 - Introduction to Generative AI#6 · Tokens for every modality|Intro §6 Tokens for every modality]]</small>
 
-> [!success]- Answer: A, B, C
-> A ✓ · B ✓ · C ✓ · D ✗
+> [!success]- Answer (click to open)
+> **A, B, C** · A ✓ · B ✓ · C ✓ · D ✗
 >
 > Pictures can be cut into patches and generated token by token too (e.g. Emu3). Diffusion noise per modality: Gaussian noise for pixels, masks for text, probabilities for DNA.
 
@@ -284,8 +321,8 @@ Noise "type" per modality: Gaussian noise for pixels/sound/video; **masks** for 
 - [ ] **C** The objective function measures the overall error <small>· look in [[2026-10-21 - Introduction to Generative AI#1 · Symbolic vs subsymbolic|Intro §1 Symbolic vs subsymbolic]]</small>
 - [ ] **D** Engineers set the parameters by hand <small>· look in [[2026-10-21 - Introduction to Generative AI#1 · Symbolic vs subsymbolic|Intro §1 Symbolic vs subsymbolic]]</small>
 
-> [!success]- Answer: A, C
-> A ✓ · B ✗ · C ✓ · D ✗
+> [!success]- Answer (click to open)
+> **A, C** · A ✓ · B ✗ · C ✓ · D ✗
 >
 > Classification, regression, next word and pictures differ only in the output and the objective; training adjusts the parameters so the error goes down.
 
@@ -298,8 +335,8 @@ Noise "type" per modality: Gaussian noise for pixels/sound/video; **masks** for 
 - [ ] **C** It needs pictures of non-cows as well <small>· look in [[2026-10-21 - Introduction to Generative AI#2 · Discriminative vs generative|Intro §2 Discriminative vs generative]]</small>
 - [ ] **D** A discriminative model p(y | x) could produce the same samples <small>· look in [[2026-10-21 - Introduction to Generative AI#2 · Discriminative vs generative|Intro §2 Discriminative vs generative]]</small>
 
-> [!success]- Answer: A, B
-> A ✓ · B ✓ · C ✗ · D ✗
+> [!success]- Answer (click to open)
+> **A, B** · A ✓ · B ✓ · C ✗ · D ✗
 >
 > A generative model learns the shape of the data: it can sample and score. A discriminative model only learns where one class ends and the next begins; it needs both classes and cannot generate.
 
@@ -312,8 +349,8 @@ Noise "type" per modality: Gaussian noise for pixels/sound/video; **masks** for 
 - [ ] **C** Qwen3’s vocabulary has about 1,000 tokens <small>· look in [[2026-10-21 - Introduction to Generative AI#6 · Tokens for every modality|Intro §6 Tokens for every modality]]</small>
 - [ ] **D** Special tokens such as <|im_start|> are added after the BPE merges <small>· look in [[2026-10-21 - Introduction to Generative AI#6 · Tokens for every modality|Intro §6 Tokens for every modality]]</small>
 
-> [!success]- Answer: A, B, D
-> A ✓ · B ✓ · C ✗ · D ✓
+> [!success]- Answer (click to open)
+> **A, B, D** · A ✓ · B ✓ · C ✗ · D ✓
 >
 > Qwen3’s vocabulary has 151,669 tokens: BPE merges on top of the 256 bytes, then the special tokens.
 
@@ -326,8 +363,8 @@ Noise "type" per modality: Gaussian noise for pixels/sound/video; **masks** for 
 - [ ] **C** Generation adds noise step by step to a clean picture <small>· look in [[2026-10-21 - Introduction to Generative AI#5 · Diffusion – all at once|Intro §5 Diffusion]]</small>
 - [ ] **D** The forward diffusion (adding noise) is learned by the network <small>· look in [[2026-10-21 - Introduction to Generative AI#5 · Diffusion – all at once|Intro §5 Diffusion]]</small>
 
-> [!success]- Answer: A, B
-> A ✓ · B ✓ · C ✗ · D ✗
+> [!success]- Answer (click to open)
+> **A, B** · A ✓ · B ✓ · C ✗ · D ✗
 >
 > Forward diffusion is a fixed procedure that makes training data; the network learns to predict the noise; generation runs backwards from pure noise.
 

@@ -26,6 +26,9 @@ course: Generative AI (194.207)
 
 ## A1 · Cool down the learning rate
 
+> [!tip] In plain words
+> Training is like **hiking down into a valley in fog**. With a big learning rate you take big leaps: great for crossing the landscape quickly, but near the bottom you bounce from one slope to the other. Lowering the learning rate at the end (cool-down) lets you take small steps and **settle at the bottom**, which gives a big drop in loss. That final phase is also the best moment to feed the best data.
+
 With a warmup–stable–decay schedule the loss landscape picture is: **travel** (high LR, big jumps across the landscape) → **bounce** (still high LR, bouncing between the walls of a valley) → **settle** (LR decays → steps get small → slides to the bottom). The decay phase gives a big loss drop and is the natural place to switch data.
 
 > [!example]- Slide 39 (click to open)
@@ -34,6 +37,9 @@ With a warmup–stable–decay schedule the loss landscape picture is: **travel*
 ---
 
 ## A2 · Finish on the best data
+
+> [!tip] In plain words
+> What a model saw last sticks best, so the last slice of training uses the **best material**: maths, code, reasoning, Q&A, worked solutions written out step by step. The goal is that the model can already **sometimes** solve a problem the right way. Reinforcement learning later can only strengthen behaviour the model already produces now and then; it cannot invent it.
 
 The last, small slice of training uses a higher-quality mix: web, code, **maths**, **reasoning**, **Q&A**, PDFs, including **thinking traces** written as plain text, *without* chat format:
 
@@ -54,6 +60,9 @@ Why: the model then already *sometimes* produces correct reasoning, and RL later
 
 ## A3 · Extend the context – 4,096 → 1,000,000
 
+> [!tip] In plain words
+> Reading a million tokens at once has three problems, like asking a student to read a whole library at once: **(1)** attention compares every token with every other one, so the work grows with the **square** of the length; **(2)** the position system (RoPE) has never seen such large positions; **(3)** there are very few really long documents to practise on. Fix (1) in the architecture from the start; fix (2) and (3) at the end of training.
+
 Three obstacles, three fixes:
 
 | Obstacle | Fix | When |
@@ -66,6 +75,10 @@ Three obstacles, three fixes:
 > ![[GenAI-L4-slajd42.png|720]]
 
 ### Excursus – attention cost and the KV cache
+
+> [!tip] In plain words
+> When a model writes, each new token needs the keys and values of **all earlier tokens**. Recomputing them every time would be absurd, so they are kept in a **notebook**: the KV cache. For each new token you compute only its own query, key and value, look things up in the notebook, and add one new line to it. Old lines never change, because thanks to the mask an old token never looks at newer ones.
+> The catch: the notebook grows with every token and can reach hundreds of gigabytes for a long context. GQA (several query heads share one key/value head) and MLA (store a compressed summary per token) make each line smaller.
 
 Training/prefill: $\text{softmax}(QK^\top/\sqrt{d_k})V$ with $Q,K \in \mathbb{R}^{n\times d_k}$ → an **$n\times n$** weight matrix per head and layer.
 
@@ -130,6 +143,9 @@ Cache 512 numbers instead of 2 × 16,384 → **64× smaller**. Trick: $W^{UK}$ c
 
 ### Stretching the positions – YaRN
 
+> [!tip] In plain words
+> RoPE's clock hands: fast hands went round many times during training, so every angle is familiar. Slow hands barely moved: at position 50,000 they would point to angles **never seen in training**, and the model gets confused. YaRN **slows down only the slow hands** (by the scale factor) so that the long text maps onto angles the model knows, and leaves the fast hands alone, because they carry the fine word order nearby. Slowing all hands would blur that local order.
+
 RoPE pair $i$ turns by $\theta_i=b^{-2(i-1)/d}$ per position. Olmo 3 7B ($b$ = 500,000, head dim 128 → 64 pairs), trained on 8K rows:
 
 | Pair | Turns within 0–8K | Status during training | YaRN (8K → 64K, scale 8) |
@@ -151,6 +167,9 @@ RoPE pair $i$ turns by $\theta_i=b^{-2(i-1)/d}$ per position. Olmo 3 7B ($b$ = 5
 
 ### Long rows, at the end (Olmo 3)
 
+> [!tip] In plain words
+> To learn long reading you need long practice texts in one piece. So the last stage uses long rows (64K) with real long documents. Short documents fill the rest of each row, and a mask makes sure each document only "sees" itself, like **putting dividers between unrelated papers in one folder**. Two thirds of the mix stays short data so the model does not forget its short-text skills.
+
 - Pre- and mid-training: rows of **8K**; long documents are cut across rows, so the model never sees one in one piece.
 - Long-context stage: rows of **64K**; a 30K PDF fits in one piece for the first time; short docs fill the rest.
 - Stage: **50B tokens**: **34%** long documents (8K–64K: PDFs, synthetic tasks) + **66%** the short mid-training mix "so short skills hold".
@@ -167,18 +186,20 @@ Extension factors reported: Olmo 3 7B ×8 (1 step), DeepSeek-V3 ×32 (2 steps), 
 
 # Part B · Post-training
 
-```mermaid
-flowchart TD
-  L["Learn from …"] --> D["a dataset<br/>what does it hold?"]
-  L --> O["its own output<br/>who scores it?"]
-  D --> E["examples to copy → SFT<br/>(curated, distillation, rejection sampling)"]
-  D --> P["pairs, one better → DPO"]
-  O --> T["a teacher, token by token → on-policy distillation"]
-  O --> R["a reward model or judge → RLHF / RLAIF"]
-  O --> C["a checker → RLVR"]
-  R --> B["the baseline: PPO (value model) / GRPO (group mean)"]
-  C --> B
-```
+> [!tip] In plain words
+> After pre-training the model can **continue text**, but it is not yet an assistant. Post-training teaches it how to behave. The big question for every method: **where does the feedback come from?** Either from a fixed dataset, or from grading the model's own answers (by a teacher, a reward model, or a program).
+
+**Where the learning signal comes from** (same tree as slide 74 below):
+
+| The model learns from … | What it holds / who scores | Method |
+|---|---|---|
+| **a dataset** | examples to copy (written by people, a stronger model, or the best of its own tries) | **SFT** |
+| **a dataset** | pairs, one answer better than the other | **DPO** |
+| **its own output** | a **teacher** grades every token | **on-policy distillation** |
+| **its own output** | a **reward model or judge** gives one score | **RLHF / RLAIF** |
+| **its own output** | a **checker** (program) says right or wrong | **RLVR** |
+
+For the last two the update needs a **baseline**: PPO takes it from a value model, GRPO from the group mean.
 
 > [!example]- Slide 74 (click to open)
 > ![[GenAI-L4-slajd74.png|720]]
@@ -186,6 +207,9 @@ flowchart TD
 ---
 
 ## B1 · SFT – examples to copy
+
+> [!tip] In plain words
+> Supervised fine-tuning is **learning by imitation**: show good (question, answer) pairs and train with the normal next-token loss. It is fast and simple, but the model only ever sees good answers; it never learns what a bad answer looks like or why it is bad.
 
 Ordinary next-token loss, on (prompt, answer) pairs. Where the answers come from:
 - **curated dataset**: people write them,
@@ -197,6 +221,10 @@ The model only learns to **imitate**; it never sees what a *bad* answer looks li
 ---
 
 ## B2 · DPO – pairs, one better
+
+> [!tip] In plain words
+> DPO learns from **pairs**: for one question, answer A was preferred to answer B. The model is pushed to raise A and lower B, **measured relative to a frozen copy of itself** (the reference). Why relative? Absolute probabilities depend on length and wording; what matters is whether training moved A up compared to where it started, and B down.
+> Think of a **taste test**: you do not need to know how good each dish is in points, only which of the two people preferred. No reward model, no sampling during training: just a fixed list of pairs.
 
 **Where "chosen" comes from:** people compare (InstructGPT: rank 4–9 answers) · a model judges (Tülu 3: GPT-4o rates) · bigger model's answer wins (Olmo 3: Qwen3-32B's answer is "chosen" over Qwen3-0.6B's). **Labelled once: a fixed dataset** (offline, no sampling during training).
 
@@ -230,6 +258,10 @@ DPO needs **no reward model and no sampling**: only policy + frozen reference + 
 
 ## B3 · On-policy distillation – a teacher, token by token
 
+> [!tip] In plain words
+> The student writes its own answer; a stronger teacher **reads it once** and says, for every single token, how likely the teacher itself would have written it. Tokens the teacher likes more than the student → push up; tokens the teacher strongly disagrees with (like "418" for 17 × 24) → push down.
+> It is like a **driving instructor commenting on every manoeuvre of your own drive**, rather than you watching videos of perfect drivers (SFT). You learn from your own mistakes, with feedback at every step.
+
 The **student (policy)** writes its own answer ("17 × 24 = 418"). The **teacher** does **one forward pass** over the student's text and gives its probability for each of the student's tokens.
 
 $$\text{grade}_t=\log p_{teacher}(\text{token}_t)-\log p_{student}(\text{token}_t),\qquad \mathcal{L}=-\sum_t \text{grade}_t\cdot\log p_{student}(\text{token}_t)$$
@@ -252,6 +284,10 @@ $$\text{grade}_t=\log p_{teacher}(\text{token}_t)-\log p_{student}(\text{token}_
 ---
 
 ## B4 · RLHF – a reward model
+
+> [!tip] In plain words
+> Step 1: people rank answers; a **reward model** learns to imitate their taste (only score differences matter: "A beats B"). Step 2: the model writes answers, the reward model scores them, and the model is pushed towards higher scores.
+> The danger is **gaming the judge** (Goodhart's law): the reward model is only an imitation of people, and if the policy optimises it too hard it finds tricks the reward model likes but people don't. Like a student who learns the examiner's quirks instead of the subject. The **KL leash** pulls the policy back towards the original model, more strongly the further it drifts.
 
 **① Train the reward model** (Bradley–Terry). People rank several answers (e.g. 4 → $\binom42=6$ pairs: 1>2, 1>3, 1>4, 2>3, 2>4, 3>4). For each pair:
 
@@ -299,12 +335,18 @@ The **reference is frozen** (the SFT model); the **reward model is frozen** duri
 
 ## B5 · RLVR – a checker
 
+> [!tip] In plain words
+> When the answer can be **checked by a program**, you do not need a judge at all: the maths answer is 408 or it is not, the code passes its tests or it does not. Reward 1 or 0, no reward model to fool. It only works where correctness is checkable; a poem or comforting a friend has no unit test.
+
 Reward = **1 / 0 from a program**, no reward model: maths (final answer = 408?), code (unit tests in a sandbox), instructions (constraints: under 50 words, no commas – a script checks), puzzles (generated, answer known), format (valid JSON, right tool call).
 Works when correctness is **verifiable**. Not for: poems, comforting a friend, summaries, "is this joke funny?" → those need RLHF/RLAIF.
 
 ---
 
 ## B6 · Why not just the reward? The baseline
+
+> [!tip] In plain words
+> If all rewards are positive, "push every answer up in proportion to its reward" makes even the worst answer more likely, just less so. Subtract a **baseline** (what you expected) and the signal becomes "better or worse than expected?": good answers go up, bad answers go down. Like grading **relative to the class average** instead of in absolute points.
 
 With $\mathcal{L}=-r\sum_t\log p$ and rewards 0.8 / 0.5 / 0.3 / 0.1 for four answers, **every** answer is pushed **up** (all $r>0$), the bad ones just less. Subtract a baseline $b$:
 
@@ -318,6 +360,10 @@ With $b$ = mean = 0.425: +0.375, +0.075, −0.125, −0.325 → better-than-aver
 ---
 
 ## B7 · PPO
+
+> [!tip] In plain words
+> PPO gets its baseline from a **value model** that predicts, at every token, how much reward is still to come. Advantage = what actually came − what was expected, so each token gets its own credit.
+> The ratio and clip are a **speed limit**: one batch of answers is reused for several updates, and once a token's probability has changed by more than ~20 % since the answer was written, PPO stops pushing it further. This keeps any single batch from changing the model too much.
 
 $$\mathcal{L}=-\sum_t\min\big(\rho_tA_t,\ \text{clip}(\rho_t,1-\varepsilon,1+\varepsilon)A_t\big)$$
 
@@ -345,6 +391,9 @@ Why the ratio and clip: we reuse one batch of samples for several gradient steps
 ---
 
 ## B8 · GRPO (DeepSeekMath)
+
+> [!tip] In plain words
+> GRPO drops the value model. Instead it asks the same question **several times** and compares the answers with each other: advantage = how much better than the group average, in units of the group's spread. Every token of an answer gets the same advantage. Like grading a set of attempts **against each other** instead of against a predicted score. If all attempts get the same reward, there is nothing to compare: no learning from that question.
 
 Sample **$G$ answers to the same prompt**, score each ($r_i$), and use the **group** as the baseline:
 
@@ -395,8 +444,8 @@ Example: $r$ = 0.8, 0.5, 0.3, 0.1 → mean 0.425, std 0.259 → $A$ = **+1.45, +
 - [ ] **C** Its key and value are stored in the cache for later tokens <small>· look in [[2026-11-11 - Training Paradigms II#Excursus – attention cost and the KV cache|TP II · Excursus]]</small>
 - [ ] **D** The keys of earlier tokens are updated to include the new token <small>· look in [[2026-11-11 - Training Paradigms II#Excursus – attention cost and the KV cache|TP II · Excursus]]</small>
 
-> [!success]- Answer: A, B, C
-> A ✓ · B ✓ · C ✓ · D ✗
+> [!success]- Answer (click to open)
+> **A, B, C** · A ✓ · B ✓ · C ✓ · D ✗
 >
 > Earlier tokens are needed only inside attention, through their keys and values. Because of the mask, a token never sees later tokens, so its key and value never change.
 
@@ -410,8 +459,8 @@ Example: $r$ = 0.8, 0.5, 0.3, 0.1 → mean 0.425, std 0.259 → $A$ = **+1.45, +
 - [ ] **C** It keeps the reward model close to its weights from before RL <small>· look in [[2026-11-11 - Training Paradigms II#B4 · RLHF – a reward model|TP II §B4 RLHF]]</small>
 - [ ] **D** It rewards the policy for tokens the reference model finds unlikely <small>· look in [[2026-11-11 - Training Paradigms II#B4 · RLHF – a reward model|TP II §B4 RLHF]]</small>
 
-> [!success]- Answer: A, B
-> A ✓ · B ✓ · C ✗ · D ✗
+> [!success]- Answer (click to open)
+> **A, B** · A ✓ · B ✓ · C ✗ · D ✗
 >
 > If the policy chases the reward model too far, its score keeps rising while the real quality goes up and then down. The KL term pulls the policy back towards the frozen SFT model, harder the further it moves. The reward model does not change during RL.
 
@@ -424,8 +473,8 @@ Example: $r$ = 0.8, 0.5, 0.3, 0.1 → mean 0.425, std 0.259 → $A$ = **+1.45, +
 - [ ] **C** The learning rate is highest at the end of training <small>· look in [[2026-11-11 - Training Paradigms II#A1 · Cool down the learning rate|TP II §A1 Cool down the learning rate]]</small>
 - [ ] **D** “Bounce”: the learning rate is still high and the steps jump between the walls of a valley <small>· look in [[2026-11-11 - Training Paradigms II#A1 · Cool down the learning rate|TP II §A1 Cool down the learning rate]]</small>
 
-> [!success]- Answer: A, B, D
-> A ✓ · B ✓ · C ✗ · D ✓
+> [!success]- Answer (click to open)
+> **A, B, D** · A ✓ · B ✓ · C ✗ · D ✓
 >
 > Travel → bounce → settle: once the learning rate decays, the steps get small and the model slides to the bottom of the valley.
 
@@ -438,8 +487,8 @@ Example: $r$ = 0.8, 0.5, 0.3, 0.1 → mean 0.425, std 0.259 → $A$ = **+1.45, +
 - [ ] **C** The lack of long documents is fixed in the architecture, from the start <small>· look in [[2026-11-11 - Training Paradigms II#A3 · Extend the context – 4,096 → 1,000,000|TP II §A3 Extend the context]]</small>
 - [ ] **D** Olmo 3’s long-context stage has 50B tokens, about a third of them long documents <small>· look in [[2026-11-11 - Training Paradigms II#Long rows, at the end (Olmo 3)|TP II · Long rows, at the end]]</small>
 
-> [!success]- Answer: A, B, D
-> A ✓ · B ✓ · C ✗ · D ✓
+> [!success]- Answer (click to open)
+> **A, B, D** · A ✓ · B ✓ · C ✗ · D ✓
 >
 > Attention: architecture, from the start. Positions and long data: mid-training. Olmo 3: 34 % long documents (8K–64K) + 66 % short mid-training mix.
 
@@ -452,8 +501,8 @@ Example: $r$ = 0.8, 0.5, 0.3, 0.1 → mean 0.425, std 0.259 → $A$ = **+1.45, +
 - [ ] **C** It shows the model what a bad answer looks like <small>· look in [[2026-11-11 - Training Paradigms II#B1 · SFT – examples to copy|TP II §B1 SFT]]</small>
 - [ ] **D** In distillation, a weaker model writes the answers <small>· look in [[2026-11-11 - Training Paradigms II#B1 · SFT – examples to copy|TP II §B1 SFT]]</small>
 
-> [!success]- Answer: A, B
-> A ✓ · B ✓ · C ✗ · D ✗
+> [!success]- Answer (click to open)
+> **A, B** · A ✓ · B ✓ · C ✗ · D ✗
 >
 > SFT only imitates. Answers come from people (curated), a stronger model (distillation) or the policy itself, filtered (rejection sampling).
 
@@ -466,8 +515,8 @@ Example: $r$ = 0.8, 0.5, 0.3, 0.1 → mean 0.425, std 0.259 → $A$ = **+1.45, +
 - [ ] **C** GQA and MLA: fewer earlier tokens, each kept at full size <small>· look in [[2026-11-11 - Training Paradigms II#Excursus – attention cost and the KV cache|TP II · Excursus]]</small>
 - [ ] **D** Sparse attention: a cheap look at compressed blocks, then full attention to a few selected ones <small>· look in [[2026-11-11 - Training Paradigms II#Excursus – attention cost and the KV cache|TP II · Excursus]]</small>
 
-> [!success]- Answer: A, B, D
-> A ✓ · B ✓ · C ✗ · D ✓
+> [!success]- Answer (click to open)
+> **A, B, D** · A ✓ · B ✓ · C ✗ · D ✓
 >
 > GQA and MLA keep every token but make each one smaller in the cache. Frontier models mix several of these across layers.
 
@@ -480,8 +529,8 @@ Example: $r$ = 0.8, 0.5, 0.3, 0.1 → mean 0.425, std 0.259 → $A$ = **+1.45, +
 - [ ] **C** KL(policy ‖ ref) always equals KL(ref ‖ policy) <small>· look in [[2026-11-11 - Training Paradigms II#B4 · RLHF – a reward model|TP II §B4 RLHF]]</small>
 - [ ] **D** For policy (0.80, 0.15, 0.05) vs reference (0.50, 0.30, 0.20) it is about 0.20 <small>· look in [[2026-11-11 - Training Paradigms II#B4 · RLHF – a reward model|TP II §B4 RLHF]]</small>
 
-> [!success]- Answer: A, B, D
-> A ✓ · B ✓ · C ✗ · D ✓
+> [!success]- Answer (click to open)
+> **A, B, D** · A ✓ · B ✓ · C ✗ · D ✓
 >
 > 0.80 · 0.47 + 0.15 · (−0.69) + 0.05 · (−1.39) ≈ 0.20. KL is not symmetric.
 
@@ -494,8 +543,8 @@ Example: $r$ = 0.8, 0.5, 0.3, 0.1 → mean 0.425, std 0.259 → $A$ = **+1.45, +
 - [ ] **C** Every token of the answer gets the same advantage <small>· look in [[2026-11-11 - Training Paradigms II#PPO vs GRPO|TP II · PPO vs GRPO]]</small>
 - [ ] **D** PPO keeps four models in memory: policy, reference, reward model, value model <small>· look in [[2026-11-11 - Training Paradigms II#PPO vs GRPO|TP II · PPO vs GRPO]]</small>
 
-> [!success]- Answer: A, B, D
-> A ✓ · B ✓ · C ✗ · D ✓
+> [!success]- Answer (click to open)
+> **A, B, D** · A ✓ · B ✓ · C ✗ · D ✓
 >
 > Aₜ = Gₜ − Vₜ varies along the answer (+0.25 … +0.13 in the example). Same advantage for all tokens is GRPO.
 

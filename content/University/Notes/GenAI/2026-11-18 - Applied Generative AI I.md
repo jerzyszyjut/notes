@@ -25,6 +25,9 @@ Same function, two behaviours: Qwen3-0.6B-**Base** continues "What does the cow 
 
 ## 1 · Which model?
 
+> [!tip] In plain words
+> Choosing a model is like choosing **a car for a job**: the fastest one is not always right. Four questions: is it good enough (quality), what does it cost, how fast does it answer (latency), and **where does my data go** (who sees the prompts, which law applies). With personal or secret data, the last question often decides before the others.
+
 **Four layers of the ecosystem** (and the question each raises):
 
 | Layer | Examples | Ask |
@@ -57,6 +60,9 @@ Same function, two behaviours: Qwen3-0.6B-**Base** continues "What does the cow 
 
 ### Elo (Arena)
 
+> [!tip] In plain words
+> Elo comes from chess: ratings only say **how likely one player beats another**. A 22-point gap means 53 : 47, barely better than a coin flip; you need a 400-point gap for 10 : 1. So a leaderboard's #1 and #5 are often practically equal.
+
 $$E_A=\frac{1}{1+10^{(R_B-R_A)/400}}$$
 
 $E_A$ = expected score (≈ win probability) of A vs B; $R_A,R_B$ = ratings. Gap +0 → 50%, **+22 → 53%** (leader vs #5 in Arena: barely better than a coin flip), +200 → 76%, +400 → 91% (10 : 1), +800 → 99%. Only **differences** matter.
@@ -69,6 +75,9 @@ $E_A$ = expected score (≈ win probability) of A vs B; $R_A,R_B$ = ratings. Gap
 > ![[GenAI-L5-slajd12.png|720]]
 
 ### Running a model locally
+
+> [!tip] In plain words
+> A local model needs memory for its weights: parameters × bytes per weight (16 bit = 2 bytes, 4 bit = half a byte), plus the KV cache. Speed is limited by how fast the memory can be read, because every new token has to **read all the weights once**, like a librarian who must walk the whole library for every word. Smaller weights (quantisation) = shorter walk = faster. A bigger model squeezed to 4 bit often beats a smaller one at 16 bit.
 
 A local model = **weights** (a file of numbers: `model.safetensors` 1.50 GB; GGUF 0.52 GB) + **inference program** (llama.cpp, Ollama, vLLM) + **hardware** (GPU, Apple silicon, or CPU).
 
@@ -104,28 +113,30 @@ Tools: Ollama (laptop, one command), LM Studio (desktop app), llama.cpp (engine 
 
 ## 2 · One request, 8 stations
 
-```mermaid
-flowchart LR
-  subgraph YC["your code"]
-    S1["1 Build the context"]
-    S8["8 Act on the answer"]
-  end
-  subgraph W["the wire"]
-    S2["2 Send the request"]
-    S7["7 Stream back"]
-  end
-  subgraph P["the provider"]
-    S3["3 Pick the endpoint"] --> S4["4 Template & tokens"] --> S5["5 Read the prompt (prefill)"] --> S6["6 Write the answer (decode)"]
-  end
-  S1 --> S2 --> S3
-  S6 --> S7 --> S8
-  S8 -.->|tool call: again| S1
-```
+> [!tip] In plain words
+> Follow one question like a **parcel through the post**: your code packs it (context), it travels over the internet, the provider unpacks it into tokens, reads it, writes an answer token by token, sends it back, and your code decides what to do with it. Each station has its own failure modes and costs.
+
+**The 8 stations of one request** (same picture as slide 19 below):
+
+| Where | Station | What happens |
+|---|---|---|
+| your code | **1 Build the context** | decide what the model gets to read |
+| the wire | **2 Send the request** | an HTTP POST with JSON |
+| the provider | **3 Pick the endpoint** | which server, which model |
+| the provider | **4 Template & tokens** | messages → one text → token IDs |
+| the provider | **5 Read the prompt (prefill)** | all prompt tokens at once, fills the KV cache |
+| the provider | **6 Write the answer (decode)** | one token per step, each one a draw |
+| the wire | **7 Stream back** | tokens arrive one by one |
+| your code | **8 Act on the answer** | check it, use it, or run the tool it asked for → back to 1 |
 
 > [!example]- Slide 19 (click to open)
 > ![[GenAI-L5-slajd19.png|720]]
 
 ### Station 1 · Build the context
+
+> [!tip] In plain words
+> The model **forgets everything between requests**: it is like talking to someone with no short-term memory, so you must hand over the whole conversation every time. Everything the model should know right now (instructions, the right documents, earlier messages) must be in the context.
+> RAG = **an open-book exam**: before answering, search your documents and paste the most relevant passages into the prompt. The model is not changed; you only control what it reads. Facts belong in the context; fine-tuning is better for style and format than for new facts.
 
 - **The model forgets everything.** Each request stands alone. Chat "memory" = the app **resends the whole history** each turn. Over $n$ turns that's $1+2+\dots+n\approx n^2/2$ messages sent → memory has a price.
 - **Two levers** on $p(\text{next token}\mid\text{context};\theta)$: change **θ** (pre/post-training by providers; fine-tuning/LoRA by you on open weights) or change the **context** (instructions, examples, documents, tool results; by you, every request).
@@ -169,13 +180,22 @@ flowchart LR
 
 ### Station 2 · Send the request
 
+> [!tip] In plain words
+> Talking to a model is an ordinary web request: send JSON with the messages, get JSON back. The bill is counted in **tokens in and tokens out**.
+
 Plain HTTP, like a web page: `POST /v1/chat/completions` with JSON `{"model", "messages":[{"role":"system"|"user"|"assistant", "content"}], "temperature", …}`; streaming reply as **server-sent events** `data: {…}` … `data: [DONE]`. Response has `choices[0].message.content`, `finish_reason`, and **`usage`: `prompt_tokens`, `completion_tokens`** – *tokens in, tokens out: that is what you pay for.* SDKs (e.g. `OpenAI(base_url=…, max_retries=3)`; 429/5xx retried) just wrap this; your code appends each answer to `history`.
 
 ### Station 3 · Pick the endpoint
 
+> [!tip] In plain words
+> The same request can go to your laptop, a big provider or a router: only the address changes. Where it goes decides price, speed and **who can read your data**.
+
 Same request, different **base URL** (laptop `localhost:11434/v1`, a provider, a router) – everything else stays the same. API dialects: **Chat Completions** (the common language: everyone), Responses (OpenAI 2025: built-in tools, server-side state), Messages (Anthropic native: caching, thinking), GenAI (Google native). LiteLLM translates. Where inference runs: lab API, cloud platform (region you pick), open-weight host, router (+5.5% fee), rented GPU (H100 \$2–5/h; a forgotten H100 ≈ \$100/day), EU provider (EU law), your machine (nobody else sees it). Students: Colab/Kaggle GPUs, free API tiers (*free often means your prompts become their training data*), TU Wien Academic AI. **API keys in `.env`, `.env` in `.gitignore`.**
 
 ### Station 4 · Template and tokens
+
+> [!tip] In plain words
+> The model never sees JSON. The server **flattens** the messages into one long text with special marker tokens (who speaks, where a message ends). Tools are also just text: a description in the prompt, and the model "calls" a tool by writing a specific piece of text. The model itself executes nothing.
 
 **The model never sees JSON.** The server turns `messages` into text with the model's **chat template**:
 
@@ -197,6 +217,10 @@ When is Test 1?<|im_end|>
 
 ### Station 5 · Read the prompt (prefill)
 
+> [!tip] In plain words
+> First the model **reads the whole prompt at once** (fast, in parallel), then writes the answer token by token (slower). So long prompts = longer wait for the first word; long answers = longer wait after it.
+> **Prefix caching**: if the beginning of the prompt is identical to a previous request, the server reuses its notes (KV cache) and skips re-reading it, like a reader who keeps a bookmark. One changed token at the start ruins the bookmark, so put stable parts first.
+
 First it reads the **whole prompt at once** (135 tokens: 0.7 s to the first token), then writes ~28 tokens/s. Longer prompts → longer wait for the **first** token (TTFT): 6,189 tokens ≈ 107 s on a CPU. *Long prompts: you wait before the first token. Long answers: after it.*
 **Prefix caching:** the server keeps the KV cache of what it has read. Turn 2 with the same start: 0.7 s vs 3.2 s; **one changed token at the start → everything after it is read again** (3.6 s). → *Put what stays the same first* (system prompt, documents), changing parts last.
 
@@ -206,6 +230,9 @@ First it reads the **whole prompt at once** (135 tokens: 0.7 s to the first toke
 > ![[GenAI-L5-slajd42.png|720]]
 
 ### Station 6 · Write the answer (decode)
+
+> [!tip] In plain words
+> Every token is a **draw from a probability distribution**, like rolling a weighted die each time, so the same question can give differently worded answers. Constrained decoding is a referee that, before each roll, **removes the forbidden options** (anything that would break the JSON schema) and rescales the rest. The answer is then guaranteed to be valid JSON, but not guaranteed to be true.
 
 **One token at a time, each one a draw** from $p(\text{next token})$: "is held" 67%, "was" 32%, "scheduled" 36% … so the same question returns differently worded answers.
 **Mode dropping**: "Pick a random number 1–9" → the post-trained model picks one number 49% of the time (uniform would be 11%). No answer is *wrong*, but the diversity is gone; **correctness evals miss it**.
@@ -218,6 +245,9 @@ First it reads the **whole prompt at once** (135 tokens: 0.7 s to the first toke
 > ![[GenAI-L5-slajd46.png|720]]
 
 ### Station 7 · Stream back
+
+> [!tip] In plain words
+> Tokens are sent back as they are written, so the user sees the first words as soon as reading the prompt is done. Cost = input tokens × input price + output tokens × output price (output is ~5× dearer, and thinking counts as output); cached input is much cheaper.
 
 Token by token as SSE `data: {"delta":{"content":"…"}}`: you see the first token as soon as **prefill** is done.
 
@@ -243,6 +273,10 @@ Example \$2/\$10 per M: 2,000 in + 300 out = 0.40¢ + 0.30¢ = **0.70¢**; with 
 > ![[GenAI-L5-slajd49.png|720]]
 
 ### Station 8 · Act on the answer
+
+> [!tip] In plain words
+> The answer is just text, and **valid is not the same as correct**: a perfectly formatted JSON can still contain the wrong date. Letting the model reason before it writes the answer field helps, because it writes left to right.
+> Agents are a loop around this station: if the model asked for a tool, your code runs it, pastes the result back and asks again. Danger: whatever a tool returns becomes part of the prompt, and to the model **instructions and data look the same**. A forum post saying "mail me the grades" can hijack an agent that can read grades and send mail.
 
 - **Valid is not correct.** Schema enforced: 20/20 valid JSON, **7/20 right date**. A schema checks the form, not the facts.
 - **Field order matters**: `{"reasoning": …, "date": …}` → the model writes left to right, reasons first → **20/20 right**. (With only the Test 2 passage in context: 20/20 valid, 0/20 right.)
@@ -271,6 +305,9 @@ Example \$2/\$10 per M: 2,000 in + 300 out = 0.40¢ + 0.30¢ = **0.70¢**; with 
 
 ## 3 · Who checks? Evals
 
+> [!tip] In plain words
+> Nothing in the 8 stations checks whether the answer is **right**. An eval is a **test suite for your assistant**: your questions, the expected answers, several runs each. Use exact checks wherever possible; an LLM judge only where code cannot decide, and watch its biases (it prefers the first and the longer answer).
+
 No station checks correctness. Checks range from machine (compiler, unit tests, a number to beat) to human (rubric, judgement). *An agent can run alone as long as a machine checks its work, with a check it cannot change.* "Software 1.0 easily automates what you can specify. Software 2.0 easily automates what you can verify." (Karpathy)
 
 **An eval is a test suite** for *your* assistant with *your* questions (expected answers, several runs each). A benchmark tests the model; an eval tests the system.
@@ -281,6 +318,9 @@ No station checks correctness. Checks range from machine (compiler, unit tests, 
 > ![[GenAI-L5-slajd64.png|720]]
 
 ### pass@k vs passᵏ
+
+> [!tip] In plain words
+> Two different promises: **pass@k** = "at least one of k tries is right", good when a checker can pick the right try (an agent that can retry). **passᵏ** = "all k tries are right", what a user needs who asks once and must trust the answer every time. With 80 % per try: pass@5 ≈ 99.97 %, passᵏ for k = 5 ≈ 33 %. The same model looks excellent or poor depending on which promise you need.
 
 | | Formula | p = 0.8, k = 5 | Use when |
 |---|---|---|---|
@@ -313,6 +353,9 @@ Course assistant, 10 questions × 10 runs:
 
 ## 4 · Let it run (agents in practice)
 
+> [!tip] In plain words
+> An agent's context fills up with its own tool calls and results, and quality drops long before it is full. And people approve almost every permission prompt without reading. So instead of trusting yourself to watch it: **give the agent a box** (a sandbox or a separate machine) where it cannot reach your files or the network beyond what it needs.
+
 - **The window fills up** (system prompt, tool definitions, AGENTS.md, every tool call + result) and quality drops long before it's full → **compaction** (summarise history; details lost) or start fresh with progress written to a file.
 - Coding with AI: chat → IDE → terminal agent → cloud agent → app builder. Terminal (CLI/TUI) won because the agent works in the shell anyway, runs over SSH/CI, every action is a readable command. *Learn the map, not the tools.*
 - Setup: a coding agent + **AGENTS.md** (context on every request) + plan → implement → test + sandbox & permissions + **one git worktree per agent**.
@@ -336,8 +379,8 @@ Course assistant, 10 questions × 10 runs:
 - [ ] **C** Agent frameworks run a fundamentally different loop than the 15-line agent.py <small>· look in [[2026-11-18 - Applied Generative AI I#Station 8 · Act on the answer|Applied · Station 8 · Act on the answer]]</small>
 - [ ] **D** An agent can run alone as long as a machine checks its work with a check it cannot change <small>· look in [[2026-11-18 - Applied Generative AI I#3 · Who checks? Evals|Applied §3 Who checks? Evals]]</small>
 
-> [!success]- Answer: D
-> A ✗ · B ✗ · C ✗ · D ✓
+> [!success]- Answer (click to open)
+> **D** · A ✗ · B ✗ · C ✗ · D ✓
 >
 > Workflow: your code chooses the path (cheap, fast, testable). Agent: the model chooses. Underneath, the frameworks run the same loop. Machine checks make unattended runs safe.
 
@@ -350,8 +393,8 @@ Course assistant, 10 questions × 10 runs:
 - [ ] **C** The request costs about 0.7 US cents <small>· look in [[2026-11-18 - Applied Generative AI I#Station 7 · Stream back|Applied · Station 7 · Stream back]]</small>
 - [ ] **D** Without caching, the input costs 3 cents <small>· look in [[2026-11-18 - Applied Generative AI I#Station 7 · Stream back|Applied · Station 7 · Stream back]]</small>
 
-> [!success]- Answer: C
-> A ✗ · B ✗ · C ✓ · D ✗
+> [!success]- Answer (click to open)
+> **C** · A ✗ · B ✗ · C ✓ · D ✗
 >
 > 2,000 · 2 / 10⁶ = 0.4 ¢ input, 300 · 10 / 10⁶ = 0.3 ¢ output: 0.7 ¢ in total, input larger. Caching cuts only the input price (to about 0.43 ¢ in total).
 
@@ -364,8 +407,8 @@ Course assistant, 10 questions × 10 runs:
 - [ ] **C** Correctness evals reliably detect lost diversity <small>· look in [[2026-11-18 - Applied Generative AI I#Station 6 · Write the answer (decode)|Applied · Station 6 · Write the answer]]</small>
 - [ ] **D** Asking for JSON in the prompt guarantees parseable output <small>· look in [[2026-11-18 - Applied Generative AI I#Station 6 · Write the answer (decode)|Applied · Station 6 · Write the answer]]</small>
 
-> [!success]- Answer: A, B
-> A ✓ · B ✓ · C ✗ · D ✗
+> [!success]- Answer (click to open)
+> **A, B** · A ✓ · B ✓ · C ✗ · D ✗
 >
 > “is held” 67 % vs “was” 32 %. Mode dropping: one number 49 % instead of a uniform 11 %; no answer is wrong, so correctness evals miss it. Asked for JSON, it wrapped the answer in ```json fences and json.loads failed.
 
@@ -378,8 +421,8 @@ Course assistant, 10 questions × 10 runs:
 - [ ] **C** Filling the context window with every document available <small>· look in [[2026-11-18 - Applied Generative AI I#Station 1 · Build the context|Applied · Station 1 · Build the context]]</small>
 - [ ] **D** Setting the temperature to 0 <small>· look in [[2026-11-18 - Applied Generative AI I#Station 8 · Act on the answer|Applied · Station 8 · Act on the answer]]</small>
 
-> [!success]- Answer: none
-> A ✗ · B ✗ · C ✗ · D ✗
+> [!success]- Answer (click to open)
+> **none** · A ✗ · B ✗ · C ✗ · D ✗
 >
 > None. Temperature 0 and a schema change the form, not what the model knows. Fine-tuning is poor for new facts. More context is not better (lost in the middle, context rot). What helps: grounding and citing, allowing “I don’t know”, self-checks, sampling and comparing, tools, measuring.
 
@@ -392,8 +435,8 @@ Course assistant, 10 questions × 10 runs:
 - [ ] **C** Open-weight means the training data is published <small>· look in [[2026-11-18 - Applied Generative AI I#1 · Which model?|Applied §1 Which model?]]</small>
 - [ ] **D** A reranker turns a text into a vector <small>· look in [[2026-11-18 - Applied Generative AI I#1 · Which model?|Applied §1 Which model?]]</small>
 
-> [!success]- Answer: A, B
-> A ✓ · B ✓ · C ✗ · D ✗
+> [!success]- Answer (click to open)
+> **A, B** · A ✓ · B ✓ · C ✗ · D ✗
 >
 > Open-weight = weights to download. An embedding model makes vectors; a reranker scores (question, passage) pairs together.
 
@@ -406,8 +449,8 @@ Course assistant, 10 questions × 10 runs:
 - [ ] **C** Changing the base URL can move the same request from your laptop to a provider <small>· look in [[2026-11-18 - Applied Generative AI I#Station 3 · Pick the endpoint|Applied · Station 3 · Pick the endpoint]]</small>
 - [ ] **D** The API key belongs in the repository so teammates can run the code <small>· look in [[2026-11-18 - Applied Generative AI I#Station 3 · Pick the endpoint|Applied · Station 3 · Pick the endpoint]]</small>
 
-> [!success]- Answer: A, B, C
-> A ✓ · B ✓ · C ✓ · D ✗
+> [!success]- Answer (click to open)
+> **A, B, C** · A ✓ · B ✓ · C ✓ · D ✗
 >
 > Tokens in, tokens out: that is what you pay for. Keys go in .env, and .env in .gitignore.
 
@@ -420,8 +463,8 @@ Course assistant, 10 questions × 10 runs:
 - [ ] **C** LLM judges agreed with humans far less than humans agreed with each other <small>· look in [[2026-11-18 - Applied Generative AI I#3 · Who checks? Evals|Applied §3 Who checks? Evals]]</small>
 - [ ] **D** Logging every request and answer helps find failures <small>· look in [[2026-11-18 - Applied Generative AI I#pass@k vs passᵏ|Applied · pass@k vs passᵏ]]</small>
 
-> [!success]- Answer: A, B, D
-> A ✓ · B ✓ · C ✗ · D ✓
+> [!success]- Answer (click to open)
+> **A, B, D** · A ✓ · B ✓ · C ✗ · D ✓
 >
 > Judge–human agreement was 85 %, human–human 81 % (Zheng et al. 2023). Logs found the invented time “14:00” for Test 2.
 
@@ -434,8 +477,8 @@ Course assistant, 10 questions × 10 runs:
 - [ ] **C** pass^k grows as k grows <small>· look in [[2026-11-18 - Applied Generative AI I#pass@k vs passᵏ|Applied · pass@k vs passᵏ]]</small>
 - [ ] **D** pass@5 is never lower than pass@1 <small>· look in [[2026-11-18 - Applied Generative AI I#pass@k vs passᵏ|Applied · pass@k vs passᵏ]]</small>
 
-> [!success]- Answer: A, B, D
-> A ✓ · B ✓ · C ✗ · D ✓
+> [!success]- Answer (click to open)
+> **A, B, D** · A ✓ · B ✓ · C ✗ · D ✓
 >
 > pass@k (at least one of k) rises towards 1; pass^k (all k) falls towards 0. Only the right passage: 63 % / 85 % / 33 %.
 

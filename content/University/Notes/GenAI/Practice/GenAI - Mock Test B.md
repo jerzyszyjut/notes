@@ -25,8 +25,8 @@ course: Generative AI (194.207)
 - [ ] **C** A neural network trained on cow pictures can be fixed the same way, by editing one weight <small>· look in [[2026-10-21 - Introduction to Generative AI#1 · Symbolic vs subsymbolic|Intro §1 Symbolic vs subsymbolic]]</small>
 - [ ] **D** Its mistake can be fixed directly by editing the rule <small>· look in [[2026-10-21 - Introduction to Generative AI#1 · Symbolic vs subsymbolic|Intro §1 Symbolic vs subsymbolic]]</small>
 
-> [!success]- Answer: A, D
-> A ✓ · B ✗ · C ✗ · D ✓
+> [!success]- Answer (click to open)
+> **A, D** · A ✓ · B ✗ · C ✗ · D ✓
 >
 > Symbolic systems reason only within explicitly encoded patterns, so unseen cases break them; but the rules are readable and editable. Subsymbolic models can only be corrected indirectly, by retraining on other data.
 
@@ -42,8 +42,8 @@ course: Generative AI (194.207)
 - [ ] **C** T seconds at sample rate f_s give a vector x with f_s · T numbers <small>· look in [[2026-10-21 - Introduction to Generative AI#6 · Tokens for every modality|Intro §6 Tokens for every modality]]</small>
 - [ ] **D** Each audio sample becomes one token <small>· look in [[2026-10-21 - Introduction to Generative AI#6 · Tokens for every modality|Intro §6 Tokens for every modality]]</small>
 
-> [!success]- Answer: A, B, C
-> A ✓ · B ✓ · C ✓ · D ✗
+> [!success]- Answer (click to open)
+> **A, B, C** · A ✓ · B ✓ · C ✓ · D ✗
 >
 > A window of samples goes through a learned encoder to one vector zₜ; optionally it is snapped to the nearest codebook entry, often repeated on the remainder (EnCodec). One token per window, not per sample.
 
@@ -59,8 +59,8 @@ course: Generative AI (194.207)
 - [ ] **C** Right after the embedding lookup, it is the same vector as ·says in any other sentence <small>· look in [[2026-10-21 - Introduction to Generative AI#7 · Embeddings (start of Language modelling)|Intro §7 Embeddings]]</small>
 - [ ] **D** The embedding table is where the context changes it <small>· look in [[2026-10-21 - Introduction to Generative AI#7 · Embeddings (start of Language modelling)|Intro §7 Embeddings]]</small>
 
-> [!success]- Answer: A, C
-> A ✓ · B ✗ · C ✓ · D ✗
+> [!success]- Answer (click to open)
+> **A, C** · A ✓ · B ✗ · C ✓ · D ✗
 >
 > The lookup is static. Read through the final layer, layer 25 still says ·cow; ·moo appears at layer 26 and reaches 93.5 % at layer 28. The context comes in through attention, not through the table.
 
@@ -76,8 +76,8 @@ course: Generative AI (194.207)
 - [ ] **C** “dog” gets the same output vector in both sentences <small>· look in [[2026-10-28 - Theoretical Foundations of Language Modelling#3 · Position – attention alone has no order|LM §3 Position]]</small>
 - [ ] **D** In principle the model can tell positions apart, since each position sees a different number of tokens <small>· look in [[2026-10-28 - Theoretical Foundations of Language Modelling#3 · Position – attention alone has no order|LM §3 Position]]</small>
 
-> [!success]- Answer: A, D
-> A ✓ · B ✗ · C ✗ · D ✓
+> [!success]- Answer (click to open)
+> **A, D** · A ✓ · B ✗ · C ✗ · D ✓
 >
 > The permutation argument holds only without the mask. With it, “dog” first sees only itself; “dog” last sees all three words. That is why the example test said: without positional encoding and without a mask.
 
@@ -93,8 +93,8 @@ course: Generative AI (194.207)
 - [ ] **C** They add up to 1 <small>· look in [[2026-10-28 - Theoretical Foundations of Language Modelling#Softmax|LM · Softmax]]</small>
 - [ ] **D** Multiplying every score by 10 brings the weights closer to (1, 0, 0) <small>· look in [[2026-10-28 - Theoretical Foundations of Language Modelling#Softmax|LM · Softmax]]</small>
 
-> [!success]- Answer: A, C, D
-> A ✓ · B ✗ · C ✓ · D ✓
+> [!success]- Answer (click to open)
+> **A, C, D** · A ✓ · B ✗ · C ✓ · D ✓
 >
 > softmax(s)ⱼ = e^sⱼ / Σ e^sᵢ: positive, sums to 1, keeps the order. A constant shift cancels out. Larger scores sharpen it toward one-hot: exactly why scores are divided by √dₖ.
 
@@ -110,8 +110,8 @@ course: Generative AI (194.207)
 - [ ] **C** The output softmax(QKᵀ/√dₖ)V has shape n × d_v <small>· look in [[2026-10-28 - Theoretical Foundations of Language Modelling#Step by step with shapes (one head, n tokens)|LM · Step by step with shapes]]</small>
 - [ ] **D** Row i of the weights says how much token i takes from each token j <small>· look in [[2026-10-28 - Theoretical Foundations of Language Modelling#Step by step with shapes (one head, n tokens)|LM · Step by step with shapes]]</small>
 
-> [!success]- Answer: B, C, D
-> A ✗ · B ✓ · C ✓ · D ✓
+> [!success]- Answer (click to open)
+> **B, C, D** · A ✗ · B ✓ · C ✓ · D ✓
 >
 > Q and K are n × dₖ, so QKᵀ is n × n: a score for every pair. Softmax runs along each row (over j). Weights (n × n) times V (n × d_v) give one new vector per token.
 
@@ -127,8 +127,8 @@ course: Generative AI (194.207)
 - [ ] **C** Sinusoidal encodings have no parameters to learn <small>· look in [[2026-10-28 - Theoretical Foundations of Language Modelling#Absolute vs relative|LM · Absolute vs relative]]</small>
 - [ ] **D** Both are applied by rotating queries and keys <small>· look in [[2026-10-28 - Theoretical Foundations of Language Modelling#RoPE in detail|LM · RoPE in detail]]</small>
 
-> [!success]- Answer: A, B, C
-> A ✓ · B ✓ · C ✓ · D ✗
+> [!success]- Answer (click to open)
+> **A, B, C** · A ✓ · B ✓ · C ✓ · D ✗
 >
 > GPT-2’s learned table: fixed context length, late rows seen only in long texts. Sinusoidal: computed for any position; distances only implicit. Both are added to the token vectors; rotating q and k is RoPE.
 
@@ -144,8 +144,8 @@ course: Generative AI (194.207)
 - [ ] **C** A linear layer maps each row to 151,936 logits <small>· look in [[2026-10-28 - Theoretical Foundations of Language Modelling#6 · Linear + softmax – what comes next|LM §6 Linear + softmax]]</small>
 - [ ] **D** Softmax turns each row into a distribution over the next token <small>· look in [[2026-10-28 - Theoretical Foundations of Language Modelling#6 · Linear + softmax – what comes next|LM §6 Linear + softmax]]</small>
 
-> [!success]- Answer: A, B, C, D
-> A ✓ · B ✓ · C ✓ · D ✓
+> [!success]- Answer (click to open)
+> **A, B, C, D** · A ✓ · B ✓ · C ✓ · D ✓
 >
 > Linear d → V gives one number per vocabulary entry; softmax makes them probabilities. Training scores every row (each predicts the token after it); generation uses only the last. Qwen3-0.6B ties the head to the embedding table.
 
@@ -161,8 +161,8 @@ course: Generative AI (194.207)
 - [ ] **C** Chinchilla: compute-optimal training uses about 20 tokens per parameter <small>· look in [[2026-11-04 - Training Paradigms I#1.2 Compute-optimal (Chinchilla, Hoffmann et al. 2022)|TP I §1.2 Compute-optimal]]</small>
 - [ ] **D** The Chinchilla-optimal model also minimises the cost of serving it <small>· look in [[2026-11-04 - Training Paradigms I#1.4 The pilot's numbers, step by step|TP I §1.4 The pilot's numbers, step by step]]</small>
 
-> [!success]- Answer: A, B, C
-> A ✓ · B ✓ · C ✓ · D ✗
+> [!success]- Answer (click to open)
+> **A, B, C** · A ✓ · B ✓ · C ✓ · D ✗
 >
 > Kaplan: log-linear trends in C, D, N. Chinchilla: N_opt ∝ C^0.49, D_opt ∝ C^0.51. It optimises training compute only: serving a bigger model costs more, which is why the pilot over-trains a small one.
 
@@ -178,8 +178,8 @@ course: Generative AI (194.207)
 - [ ] **C** The router picks the experts once per document <small>· look in [[2026-10-28 - Theoretical Foundations of Language Modelling#4 · Feed-forward – knowledge|LM §4 Feed-forward]]</small>
 - [ ] **D** During training every token goes through all 256 experts <small>· look in [[2026-11-04 - Training Paradigms I#1.6 Dense vs mixture of experts|TP I §1.6 Dense vs mixture of experts]]</small>
 
-> [!success]- Answer: A, B
-> A ✓ · B ✓ · C ✗ · D ✗
+> [!success]- Answer (click to open)
+> **A, B** · A ✓ · B ✓ · C ✗ · D ✗
 >
 > Only the selected experts run; the router decides per token (and per layer). Total ÷ active ≈ 32 keeps the knowledge capacity of a much larger model at the compute of the active part.
 
@@ -195,8 +195,8 @@ course: Generative AI (194.207)
 - [ ] **C** The batch loss is the sum of the GPUs’ mean losses <small>· look in [[2026-11-04 - Training Paradigms I#3 · Pre-training – one step|TP I §3 Pre-training]]</small>
 - [ ] **D** p = 1 gives a loss of 0 <small>· look in [[2026-11-04 - Training Paradigms I#3 · Pre-training – one step|TP I §3 Pre-training]]</small>
 
-> [!success]- Answer: A, B, D
-> A ✓ · B ✓ · C ✗ · D ✓
+> [!success]- Answer (click to open)
+> **A, B, D** · A ✓ · B ✓ · C ✗ · D ✓
 >
 > −log 1 = 0, −log 0.5 = ln 2 ≈ 0.69, −log(1/151,936) = ln 151,936 ≈ 11.9. The batch loss is the mean over all tokens; with equal counts per GPU that is the mean of the GPUs’ means, not their sum.
 
@@ -212,8 +212,8 @@ course: Generative AI (194.207)
 - [ ] **C** Each weight’s gradient is clipped to [−1, 1] on its own <small>· look in [[2026-11-04 - Training Paradigms I#3 · Pre-training – one step|TP I §3 Pre-training]]</small>
 - [ ] **D** It guards against the huge gradient of a loss spike <small>· look in [[2026-11-04 - Training Paradigms I#3 · Pre-training – one step|TP I §3 Pre-training]]</small>
 
-> [!success]- Answer: A, B, D
-> A ✓ · B ✓ · C ✗ · D ✓
+> [!success]- Answer (click to open)
+> **A, B, D** · A ✓ · B ✓ · C ✗ · D ✓
 >
 > The norm of the gradient of all weights together is computed; if it exceeds 1.0, the whole vector is rescaled. Usual steps are untouched; a spike step keeps its direction but gets length 1.
 
@@ -229,8 +229,8 @@ course: Generative AI (194.207)
 - [ ] **C** Adding thinking traces as chat conversations with user and assistant roles <small>· look in [[2026-11-11 - Training Paradigms II#A2 · Finish on the best data|TP II §A2 Finish on the best data]]</small>
 - [ ] **D** Cooling down the learning rate <small>· look in [[2026-11-11 - Training Paradigms II#A1 · Cool down the learning rate|TP II §A1 Cool down the learning rate]]</small>
 
-> [!success]- Answer: A, B, D
-> A ✓ · B ✓ · C ✗ · D ✓
+> [!success]- Answer (click to open)
+> **A, B, D** · A ✓ · B ✓ · C ✗ · D ✓
 >
 > Mid-training: cool down, finish on the best data, extend the context. Thinking traces go in as plain text without chat format; the chat template comes with post-training.
 
@@ -246,8 +246,8 @@ course: Generative AI (194.207)
 - [ ] **C** The slowest pairs are slowed down by a factor of 8 <small>· look in [[2026-11-11 - Training Paradigms II#Stretching the positions – YaRN|TP II · Stretching the positions]]</small>
 - [ ] **D** With YaRN, no training on long documents is needed <small>· look in [[2026-11-11 - Training Paradigms II#Long rows, at the end (Olmo 3)|TP II · Long rows, at the end]]</small>
 
-> [!success]- Answer: A, B, C
-> A ✓ · B ✓ · C ✓ · D ✗
+> [!success]- Answer (click to open)
+> **A, B, C** · A ✓ · B ✓ · C ✓ · D ✗
 >
 > Pair 1 turns 1,304 times in 8K: every angle seen, keep it. Pair 48 turns only 31°: beyond 8K it would reach unseen angles, so ÷8 maps 0–64K into the seen range. A long-context stage (64K rows) still follows.
 
@@ -263,8 +263,8 @@ course: Generative AI (194.207)
 - [ ] **C** The baseline changes which answer has the highest reward <small>· look in [[2026-11-11 - Training Paradigms II#B6 · Why not just the reward? The baseline|TP II §B6 Why not just the reward? The baseline]]</small>
 - [ ] **D** With the baseline, answers below the average are made less likely <small>· look in [[2026-11-11 - Training Paradigms II#B6 · Why not just the reward? The baseline|TP II §B6 Why not just the reward? The baseline]]</small>
 
-> [!success]- Answer: A, B, D
-> A ✓ · B ✓ · C ✗ · D ✓
+> [!success]- Answer (click to open)
+> **A, B, D** · A ✓ · B ✓ · C ✗ · D ✓
 >
 > All rewards are positive, so −r · Σ log p pushes every answer up, the bad ones just less. r − b is negative for 0.3 and 0.1. Subtracting a constant does not reorder rewards. PPO: Aₜ = Gₜ − Vₜ; GRPO: the group mean.
 
@@ -280,8 +280,8 @@ course: Generative AI (194.207)
 - [ ] **C** The ranking gives 6 pairs of a better and a worse answer <small>· look in [[2026-11-11 - Training Paradigms II#B4 · RLHF – a reward model|TP II §B4 RLHF]]</small>
 - [ ] **D** Only the difference between the two scores matters for the loss <small>· look in [[2026-11-11 - Training Paradigms II#B4 · RLHF – a reward model|TP II §B4 RLHF]]</small>
 
-> [!success]- Answer: A, C, D
-> A ✓ · B ✗ · C ✓ · D ✓
+> [!success]- Answer (click to open)
+> **A, C, D** · A ✓ · B ✗ · C ✓ · D ✓
 >
 > 4 choose 2 = 6. With r⁺ = 1.4 and r⁻ = −0.6: −log σ(2.0) ≈ 0.13. Adding a constant to both scores leaves the loss unchanged. During RL the reward model is frozen.
 
@@ -297,8 +297,8 @@ course: Generative AI (194.207)
 - [ ] **C** A reranker reads the question and the passage together <small>· look in [[2026-11-18 - Applied Generative AI I#Station 1 · Build the context|Applied · Station 1 · Build the context]]</small>
 - [ ] **D** Embeddings reliably tell “Test 1” and “Test 2” apart <small>· look in [[2026-11-18 - Applied Generative AI I#Station 1 · Build the context|Applied · Station 1 · Build the context]]</small>
 
-> [!success]- Answer: B, C
-> A ✗ · B ✓ · C ✓ · D ✗
+> [!success]- Answer (click to open)
+> **B, C** · A ✗ · B ✓ · C ✓ · D ✗
 >
 > Embeddings capture meaning but blur numbers and names; BM25 matches words. A reranker scores each (question, passage) pair jointly: best, but slower, so only on the top few. RAG changes the context, never the weights.
 
@@ -314,8 +314,8 @@ course: Generative AI (194.207)
 - [ ] **C** Adding 100 points to both ratings changes the expected result <small>· look in [[2026-11-18 - Applied Generative AI I#Elo (Arena)|Applied · Elo]]</small>
 - [ ] **D** A 400-point gap would mean odds of about 10 : 1 <small>· look in [[2026-11-18 - Applied Generative AI I#Elo (Arena)|Applied · Elo]]</small>
 
-> [!success]- Answer: A, D
-> A ✓ · B ✗ · C ✗ · D ✓
+> [!success]- Answer (click to open)
+> **A, D** · A ✓ · B ✗ · C ✗ · D ✓
 >
 > E = 1 / (1 + 10^(−22/400)) ≈ 0.53; for 400: 1 / (1 + 10⁻¹) ≈ 0.91. Only the difference matters. A preference vote is not your task: benchmarks narrow the choice, your own eval decides.
 
@@ -331,8 +331,8 @@ course: Generative AI (194.207)
 - [ ] **C** Decode speed is bounded by memory bandwidth ÷ bytes of active weights <small>· look in [[2026-11-18 - Applied Generative AI I#Running a model locally|Applied · Running a model locally]]</small>
 - [ ] **D** Quantising from 16 to 4 bit usually makes decoding slower <small>· look in [[2026-11-18 - Applied Generative AI I#Running a model locally|Applied · Running a model locally]]</small>
 
-> [!success]- Answer: A, B, C
-> A ✓ · B ✓ · C ✓ · D ✗
+> [!success]- Answer (click to open)
+> **A, B, C** · A ✓ · B ✓ · C ✓ · D ✗
 >
 > memory ≈ parameters × bytes per weight (+ KV cache): 8B × 0.5 B = 4 GB. Each token reads every active weight once, so fewer bytes means faster (11.5 → 25.6 tok/s). 1,359 MB vs 1,509 MB, 86 % vs 84 % pass@1.
 
@@ -348,34 +348,8 @@ course: Generative AI (194.207)
 - [ ] **C** The tool’s name, description and parameters as text in the system prompt <small>· look in [[2026-11-18 - Applied Generative AI I#Station 4 · Template and tokens|Applied · Station 4 · Template and tokens]]</small>
 - [ ] **D** Text in which <|im_start|> and <|im_end|> mark the messages, each one token <small>· look in [[2026-11-18 - Applied Generative AI I#Station 4 · Template and tokens|Applied · Station 4 · Template and tokens]]</small>
 
-> [!success]- Answer: C, D
-> A ✗ · B ✗ · C ✓ · D ✓
+> [!success]- Answer (click to open)
+> **C, D** · A ✗ · B ✗ · C ✓ · D ✓
 >
 > The server applies the chat template; the special tokens were learned in post-training. A tool is just text in the prompt; the model “calls” it by writing <tool_call>…</tool_call>, and your code runs it.
 
----
-
-> [!example]- Answer key
->
-> | Q | Correct | Lecture |
-> |---|---|---|
-> | 1 | A, D | Introduction to Generative AI |
-> | 2 | A, B, C | Introduction to Generative AI |
-> | 3 | A, C | Introduction to Generative AI |
-> | 4 | A, D | Theoretical Foundations of Language Modelling |
-> | 5 | A, C, D | Theoretical Foundations of Language Modelling |
-> | 6 | B, C, D | Theoretical Foundations of Language Modelling |
-> | 7 | A, B, C | Theoretical Foundations of Language Modelling |
-> | 8 | A, B, C, D | Theoretical Foundations of Language Modelling |
-> | 9 | A, B, C | Training Paradigms I |
-> | 10 | A, B | Training Paradigms I |
-> | 11 | A, B, D | Training Paradigms I |
-> | 12 | A, B, D | Training Paradigms I |
-> | 13 | A, B, D | Training Paradigms II |
-> | 14 | A, B, C | Training Paradigms II |
-> | 15 | A, B, D | Training Paradigms II |
-> | 16 | A, C, D | Training Paradigms II |
-> | 17 | B, C | Applied Generative AI I |
-> | 18 | A, D | Applied Generative AI I |
-> | 19 | A, B, C | Applied Generative AI I |
-> | 20 | C, D | Applied Generative AI I |
