@@ -1,3 +1,34 @@
 @use "./variables.scss" as *;
 
 // put your custom CSS here!
+
+// Reader mode (book icon next to search): hide both sidebars, keep only the note.
+// The toolbar (search, dark mode, reader mode) stays pinned top-left so it can be switched back.
+:root[reader-mode="on"] .page > #quartz-body {
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-rows: auto auto auto !important;
+  grid-template-areas: "grid-header" "grid-center" "grid-footer" !important;
+}
+:root[reader-mode="on"] .sidebar.right {
+  display: none !important;
+}
+:root[reader-mode="on"] .sidebar.left {
+  opacity: 1 !important;
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  height: auto !important;
+  width: auto !important;
+  padding: 1rem !important;
+  z-index: 10;
+}
+:root[reader-mode="on"] .sidebar.left > *:not(.flex-component) {
+  display: none !important;
+}
+:root[reader-mode="on"] .page .center,
+:root[reader-mode="on"] .page .page-header {
+  max-width: 860px;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}

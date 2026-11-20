@@ -54,7 +54,8 @@ for n in "${published[@]}"; do
   cp "$VAULT/$n" "$dest"
 
   # Attachments linked or embedded as [[file.pdf]] / ![[image.png|300]] go next to the note.
-  grep -oP '!?\[\[\K[^]|#]+\.(?!md\])[A-Za-z0-9]+(?=[]|#])' "$VAULT/$n" | sort -u |
+  # `|| true`: a note without attachments makes grep exit 1, which pipefail + set -e would turn into an abort.
+  { grep -oP '!?\[\[\K[^]|#]+\.(?!md\])[A-Za-z0-9]+(?=[]|#])' "$VAULT/$n" || true; } | sort -u |
     while IFS= read -r att; do
       src=$(find "$VAULT" -path "$VAULT/.obsidian" -prune -o -type f -path "*/$att" -print -quit)
       [[ -z "$src" ]] && src=$(find "$VAULT" -path "$VAULT/.obsidian" -prune -o -type f -name "$(basename "$att")" -print -quit)
