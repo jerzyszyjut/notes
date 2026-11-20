@@ -25,10 +25,16 @@
 :root[reader-mode="on"] .sidebar.left > *:not(.flex-component) {
   display: none !important;
 }
-:root[reader-mode="on"] .page .center,
-:root[reader-mode="on"] .page .page-header {
-  max-width: 860px;
-  width: 100%;
-  margin-left: auto;
-  margin-right: auto;
+:root[reader-mode="on"] .page > #quartz-body > .center,
+:root[reader-mode="on"] .page > #quartz-body > footer,
+:root[reader-mode="on"] .page > #quartz-body > .page-footer {
+  width: 100% !important;
+  max-width: 880px !important;
+  min-width: 0 !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  box-sizing: border-box;
+}
+:root[reader-mode="on"] .sidebar.left {
+  background: var(--light);
 }
