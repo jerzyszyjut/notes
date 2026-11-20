@@ -7,7 +7,7 @@ site: none
 course: Generative AI (194.207)
 ---
 
-# 05 · Applied Generative AI I (18 Nov): from model to system
+# 05 · Applied Generative AI I (18 Nov) – from model to system
 
 > [!abstract] The lecture in one line
 > **A model is a function. An application is a system around it.** Follow one question ("When is Test 1?") through **8 stations**, then ask: who checks that the answer is right? → **evals**.
@@ -18,8 +18,8 @@ course: Generative AI (194.207)
 
 Same function, two behaviours: Qwen3-0.6B-**Base** continues "What does the cow say?" with more questions ("What does the goat say? …"); the **post-trained** Qwen3-0.6B answers like an assistant. Between them: post-training (TP II) and a system around it (today). Asked "When is Test 1?" with no context, it confidently invents a date: **0 of 20** right.
 
-> [!example]+ Slide 78
-> ![[GenAI-L5-slajd78.png|760]]
+> [!example]- Slide 78 (click to open)
+> ![[GenAI-L5-slajd78.png|720]]
 
 ---
 
@@ -52,8 +52,8 @@ Same function, two behaviours: Qwen3-0.6B-**Base** continues "What does the cow 
 
 **How good is a model? Benchmarks** (knowledge: Humanity's Last Exam; maths: AIME, FrontierMath; code: SWE-bench Pro; agents: τ²-bench, OSWorld; preference: Arena) suffer from **contamination** (test in training data), **saturation** (everyone > 90%), **Goodhart** (what is ranked gets optimised), and **not your task** (no benchmark asks for Test 1). → *Benchmarks narrow the choice. Your own eval decides.*
 
-> [!example]+ Slide 5
-> ![[GenAI-L5-slajd05.png|760]]
+> [!example]- Slide 5 (click to open)
+> ![[GenAI-L5-slajd05.png|720]]
 
 ### Elo (Arena)
 
@@ -61,8 +61,12 @@ $$E_A=\frac{1}{1+10^{(R_B-R_A)/400}}$$
 
 $E_A$ = expected score (≈ win probability) of A vs B; $R_A,R_B$ = ratings. Gap +0 → 50%, **+22 → 53%** (leader vs #5 in Arena: barely better than a coin flip), +200 → 76%, +400 → 91% (10 : 1), +800 → 99%. Only **differences** matter.
 
-> [!example]+ Slide 12
-> ![[GenAI-L5-slajd12.png|760]]
+**Try it: Elo expected score**
+
+<iframe src="https://jerzyszyjut.github.io/notes/university/notes/genai/genai-lab.htm?tool=elo" width="100%" height="360" loading="lazy" style="border:1px solid #8884; border-radius:8px;"></iframe>
+
+> [!example]- Slide 12 (click to open)
+> ![[GenAI-L5-slajd12.png|720]]
 
 ### Running a model locally
 
@@ -87,10 +91,14 @@ Decoding reads all active weights once per token (memory-bound, see KV cache in 
 
 Tools: Ollama (laptop, one command), LM Studio (desktop app), llama.cpp (engine underneath), mlx-lm (Apple Silicon), vLLM / SGLang (GPU server, many users). **All speak the OpenAI format.** Weights from Hugging Face (some gated), re-uploads as GGUF, Ollama library, ModelScope. **Read the licence**: Apache-2.0/MIT vs own licences with conditions.
 
-> [!example]+ Slides 14, 15
-> ![[GenAI-L5-slajd14.png|760]]
+**Try it: Will it fit, how fast?**
+
+<iframe src="https://jerzyszyjut.github.io/notes/university/notes/genai/genai-lab.htm?tool=memory" width="100%" height="440" loading="lazy" style="border:1px solid #8884; border-radius:8px;"></iframe>
+
+> [!example]- Slides 14, 15 (click to open)
+> ![[GenAI-L5-slajd14.png|720]]
 >
-> ![[GenAI-L5-slajd15.png|760]]
+> ![[GenAI-L5-slajd15.png|720]]
 
 ---
 
@@ -114,8 +122,8 @@ flowchart LR
   S8 -.->|tool call: again| S1
 ```
 
-> [!example]+ Slide 19
-> ![[GenAI-L5-slajd19.png|760]]
+> [!example]- Slide 19 (click to open)
+> ![[GenAI-L5-slajd19.png|720]]
 
 ### Station 1 · Build the context
 
@@ -146,18 +154,18 @@ flowchart LR
 
 → **Fine-tuning is good for format and focus, bad for new knowledge. Facts belong in the context.**
 
-> [!example]+ Slides 21, 23, 24, 25, 26, 29
-> ![[GenAI-L5-slajd21.png|760]]
+> [!example]- Slides 21, 23, 24, 25, 26, 29 (click to open)
+> ![[GenAI-L5-slajd21.png|720]]
 >
-> ![[GenAI-L5-slajd23.png|760]]
+> ![[GenAI-L5-slajd23.png|720]]
 >
-> ![[GenAI-L5-slajd24.png|760]]
+> ![[GenAI-L5-slajd24.png|720]]
 >
-> ![[GenAI-L5-slajd25.png|760]]
+> ![[GenAI-L5-slajd25.png|720]]
 >
-> ![[GenAI-L5-slajd26.png|760]]
+> ![[GenAI-L5-slajd26.png|720]]
 >
-> ![[GenAI-L5-slajd29.png|760]]
+> ![[GenAI-L5-slajd29.png|720]]
 
 ### Station 2 · Send the request
 
@@ -182,20 +190,20 @@ When is Test 1?<|im_end|>
 `<|im_start|>`/`<|im_end|>` are **one token each, learned in post-training**. 135 tokens here = `prompt_tokens`. The model then predicts token after token until `<|im_end|>`.
 **A tool is just text in the prompt**: tool name, description, JSON schema inside `<tools>…</tools>` in the system prompt; the model "calls" it by *writing* `<tool_call>{"name": …, "arguments": …}</tool_call>`. Qwen3-0.6B: perfect form, wrong date, wrong format, invented time. Whether the tool comes from **MCP** or your code, it ends up like this.
 
-> [!example]+ Slides 39, 40
-> ![[GenAI-L5-slajd39.png|760]]
+> [!example]- Slides 39, 40 (click to open)
+> ![[GenAI-L5-slajd39.png|720]]
 >
-> ![[GenAI-L5-slajd40.png|760]]
+> ![[GenAI-L5-slajd40.png|720]]
 
 ### Station 5 · Read the prompt (prefill)
 
 First it reads the **whole prompt at once** (135 tokens: 0.7 s to the first token), then writes ~28 tokens/s. Longer prompts → longer wait for the **first** token (TTFT): 6,189 tokens ≈ 107 s on a CPU. *Long prompts: you wait before the first token. Long answers: after it.*
 **Prefix caching:** the server keeps the KV cache of what it has read. Turn 2 with the same start: 0.7 s vs 3.2 s; **one changed token at the start → everything after it is read again** (3.6 s). → *Put what stays the same first* (system prompt, documents), changing parts last.
 
-> [!example]+ Slides 41, 42
-> ![[GenAI-L5-slajd41.png|760]]
+> [!example]- Slides 41, 42 (click to open)
+> ![[GenAI-L5-slajd41.png|720]]
 >
-> ![[GenAI-L5-slajd42.png|760]]
+> ![[GenAI-L5-slajd42.png|720]]
 
 ### Station 6 · Write the answer (decode)
 
@@ -204,10 +212,10 @@ First it reads the **whole prompt at once** (135 tokens: 0.7 s to the first toke
 **Asking for JSON in the prompt** → model wraps it in ```` ```json ```` fences → `json.loads` fails.
 **Constrained decoding:** at each step, tokens the schema doesn't allow are struck out (**even the most likely one**: ```` ``` ```` 94.2%) and the rest are **renormalised** (`{↵` 4.4% → 77.0%, `{"` 1.2% → 21.1%). Then draw, and the schema decides again at the next token. (Same idea as conditional probability: drop what's impossible, renormalise.)
 
-> [!example]+ Slides 44, 46
-> ![[GenAI-L5-slajd44.png|760]]
+> [!example]- Slides 44, 46 (click to open)
+> ![[GenAI-L5-slajd44.png|720]]
 >
-> ![[GenAI-L5-slajd46.png|760]]
+> ![[GenAI-L5-slajd46.png|720]]
 
 ### Station 7 · Stream back
 
@@ -227,8 +235,12 @@ Token by token as SSE `data: {"delta":{"content":"…"}}`: you see the first tok
 
 Example \$2/\$10 per M: 2,000 in + 300 out = 0.40¢ + 0.30¢ = **0.70¢**; with 1,500 of the input cached: 0.10¢ + 0.03¢ + 0.30¢ ≈ **0.43¢**. 600 students × 10 questions/week at \$1/\$5: RAG top-3 (1,500 tokens) ≈ \$15/week; all documents (100,000 tokens) ≈ \$606; all documents cached ≈ \$66.
 
-> [!example]+ Slide 49
-> ![[GenAI-L5-slajd49.png|760]]
+**Try it: What a request costs**
+
+<iframe src="https://jerzyszyjut.github.io/notes/university/notes/genai/genai-lab.htm?tool=cost" width="100%" height="480" loading="lazy" style="border:1px solid #8884; border-radius:8px;"></iframe>
+
+> [!example]- Slide 49 (click to open)
+> ![[GenAI-L5-slajd49.png|720]]
 
 ### Station 8 · Act on the answer
 
@@ -246,14 +258,14 @@ Example \$2/\$10 per M: 2,000 in + 300 out = 0.40¢ + 0.30¢ = **0.70¢**; with 
 
 **The lethal trifecta** (Simon Willison 2025): **private data** (your grades) + **untrusted content** (the forum) + **a way out** (send_mail). Remove one leg (e.g. after reading the forum, mail only with user confirmation).
 
-> [!example]+ Slides 50, 51, 52, 60
-> ![[GenAI-L5-slajd50.png|760]]
+> [!example]- Slides 50, 51, 52, 60 (click to open)
+> ![[GenAI-L5-slajd50.png|720]]
 >
-> ![[GenAI-L5-slajd51.png|760]]
+> ![[GenAI-L5-slajd51.png|720]]
 >
-> ![[GenAI-L5-slajd52.png|760]]
+> ![[GenAI-L5-slajd52.png|720]]
 >
-> ![[GenAI-L5-slajd60.png|760]]
+> ![[GenAI-L5-slajd60.png|720]]
 
 ---
 
@@ -265,10 +277,10 @@ No station checks correctness. Checks range from machine (compiler, unit tests, 
 
 **When code cannot check: LLM as judge.** Prefer deterministic checks first (exact match, schema, regex, unit test). Judge biases: prefers the **first** answer (position), the **longer** answer, **its own style**. → calibrate against human labels; **swap the order**. Judge–human agreement 85% vs human–human 81% (Zheng et al. 2023). Score "I don't know" **above** a wrong answer, or you select the best guesser.
 
-> [!example]+ Slide 64
-> ![[GenAI-L5-slajd64.png|760]]
+> [!example]- Slide 64 (click to open)
+> ![[GenAI-L5-slajd64.png|720]]
 
-### pass@k vs pass^k
+### pass@k vs passᵏ
 
 | | Formula | p = 0.8, k = 5 | Use when |
 |---|---|---|---|
@@ -288,14 +300,16 @@ Course assistant, 10 questions × 10 runs:
 
 *Log every request and every answer – that's where you find failures like "Test 2 will be held on Thursday, January 28, 2027, at 14:00" (invented time).*
 
-> [!example]+ Slides 66, 67
-> ![[GenAI-L5-slajd66.png|760]]
+**Try it: pass@k vs pass^k**
+
+<iframe src="https://jerzyszyjut.github.io/notes/university/notes/genai/genai-lab.htm?tool=passk" width="100%" height="520" loading="lazy" style="border:1px solid #8884; border-radius:8px;"></iframe>
+
+> [!example]- Slides 66, 67 (click to open)
+> ![[GenAI-L5-slajd66.png|720]]
 >
-> ![[GenAI-L5-slajd67.png|760]]
+> ![[GenAI-L5-slajd67.png|720]]
 
-<iframe src="https://jerzyszyjut.github.io/notes/university/notes/genai/genai-lab.htm#applied" width="100%" height="860" loading="lazy" style="border:1px solid #8884; border-radius:8px;"></iframe>
-
-*Interactive: **Applied** tab of the [[GenAI Lab]] · [[genai-lab.htm|open it full screen]]*
+---
 
 ## 4 · Let it run (agents in practice)
 
@@ -304,6 +318,126 @@ Course assistant, 10 questions × 10 runs:
 - Setup: a coding agent + **AGENTS.md** (context on every request) + plan → implement → test + sandbox & permissions + **one git worktree per agent**.
 - **Give the agent a box**: 93% of permission prompts get approved (people stop reading). Limit **files and network** – one without the other is not enough. Best box: a cloud server with nothing personal on it.
 - Always-on personal agents (OpenClaw etc.) have **all three legs of the lethal trifecta** at once.
+
+---
+
+## Practice questions (8)
+
+> [!info] Same format as the test
+> 0 to 4 options can be correct: decide each option on its own, true or false. Next to each option is the section above that answers it.
+> Full timed tests: [[GenAI - Mock Test A|Mock A]] · [[GenAI - Mock Test B|Mock B]] · [[GenAI - Mock Test C|Mock C]] · [[GenAI - Mock Test D|Mock D]] (their questions are not repeated here).
+
+### P1 · workflow or agent
+
+**What is true about workflows and agents?**
+
+- [ ] **A** A fixed workflow is usually the more expensive and harder to test option <small>· look in [[2026-11-18 - Applied Generative AI I#Station 8 · Act on the answer|Applied · Station 8 · Act on the answer]]</small>
+- [ ] **B** In an agent, your code chooses the sequence of steps <small>· look in [[2026-11-18 - Applied Generative AI I#Station 8 · Act on the answer|Applied · Station 8 · Act on the answer]]</small>
+- [ ] **C** Agent frameworks run a fundamentally different loop than the 15-line agent.py <small>· look in [[2026-11-18 - Applied Generative AI I#Station 8 · Act on the answer|Applied · Station 8 · Act on the answer]]</small>
+- [ ] **D** An agent can run alone as long as a machine checks its work with a check it cannot change <small>· look in [[2026-11-18 - Applied Generative AI I#3 · Who checks? Evals|Applied §3 Who checks? Evals]]</small>
+
+> [!success]- Answer: D
+> A ✗ · B ✗ · C ✗ · D ✓
+>
+> Workflow: your code chooses the path (cheap, fast, testable). Agent: the model chooses. Underneath, the frameworks run the same loop. Machine checks make unattended runs safe.
+
+### P2 · cost
+
+**Prices are 2 per million input tokens and 10 per million output tokens (USD). One question uses 2,000 input and 300 output tokens. What is true?**
+
+- [ ] **A** Caching 1,500 of the input tokens makes the output cheaper <small>· look in [[2026-11-18 - Applied Generative AI I#Station 7 · Stream back|Applied · Station 7 · Stream back]]</small>
+- [ ] **B** Output tokens are the larger part of the bill here <small>· look in [[2026-11-18 - Applied Generative AI I#Station 7 · Stream back|Applied · Station 7 · Stream back]]</small>
+- [ ] **C** The request costs about 0.7 US cents <small>· look in [[2026-11-18 - Applied Generative AI I#Station 7 · Stream back|Applied · Station 7 · Stream back]]</small>
+- [ ] **D** Without caching, the input costs 3 cents <small>· look in [[2026-11-18 - Applied Generative AI I#Station 7 · Stream back|Applied · Station 7 · Stream back]]</small>
+
+> [!success]- Answer: C
+> A ✗ · B ✗ · C ✓ · D ✗
+>
+> 2,000 · 2 / 10⁶ = 0.4 ¢ input, 300 · 10 / 10⁶ = 0.3 ¢ output: 0.7 ¢ in total, input larger. Caching cuts only the input price (to about 0.43 ¢ in total).
+
+### P3 · sampling
+
+**The post-trained Qwen3-0.6B answers the same question several times. What is true?**
+
+- [ ] **A** Asked for a random number from 1 to 9, it picks one number far more often than 11 % <small>· look in [[2026-11-18 - Applied Generative AI I#Station 6 · Write the answer (decode)|Applied · Station 6 · Write the answer]]</small>
+- [ ] **B** Each token is drawn from a distribution, so the wording can differ between runs <small>· look in [[2026-11-18 - Applied Generative AI I#Station 6 · Write the answer (decode)|Applied · Station 6 · Write the answer]]</small>
+- [ ] **C** Correctness evals reliably detect lost diversity <small>· look in [[2026-11-18 - Applied Generative AI I#Station 6 · Write the answer (decode)|Applied · Station 6 · Write the answer]]</small>
+- [ ] **D** Asking for JSON in the prompt guarantees parseable output <small>· look in [[2026-11-18 - Applied Generative AI I#Station 6 · Write the answer (decode)|Applied · Station 6 · Write the answer]]</small>
+
+> [!success]- Answer: A, B
+> A ✓ · B ✓ · C ✗ · D ✗
+>
+> “is held” 67 % vs “was” 32 %. Mode dropping: one number 49 % instead of a uniform 11 %; no answer is wrong, so correctness evals miss it. Asked for JSON, it wrapped the answer in ```json fences and json.loads failed.
+
+### P4 · hallucination
+
+**Which of these on its own reliably stops a model from inventing facts?**
+
+- [ ] **A** Enforcing a JSON schema on the output <small>· look in [[2026-11-18 - Applied Generative AI I#Station 8 · Act on the answer|Applied · Station 8 · Act on the answer]]</small>
+- [ ] **B** Fine-tuning the model once on the course documents <small>· look in [[2026-11-18 - Applied Generative AI I#Station 1 · Build the context|Applied · Station 1 · Build the context]]</small>
+- [ ] **C** Filling the context window with every document available <small>· look in [[2026-11-18 - Applied Generative AI I#Station 1 · Build the context|Applied · Station 1 · Build the context]]</small>
+- [ ] **D** Setting the temperature to 0 <small>· look in [[2026-11-18 - Applied Generative AI I#Station 8 · Act on the answer|Applied · Station 8 · Act on the answer]]</small>
+
+> [!success]- Answer: none
+> A ✗ · B ✗ · C ✗ · D ✗
+>
+> None. Temperature 0 and a schema change the form, not what the model knows. Fine-tuning is poor for new facts. More context is not better (lost in the middle, context rot). What helps: grounding and citing, allowing “I don’t know”, self-checks, sampling and comparing, tools, measuring.
+
+### P5 · ecosystem terms
+
+**What is true about the terms from the lecture?**
+
+- [ ] **A** Under the EU AI Act, a general-purpose model is presumed to have systemic risk above 10²⁵ FLOP of training compute <small>· look in [[2026-11-18 - Applied Generative AI I#1 · Which model?|Applied §1 Which model?]]</small>
+- [ ] **B** Open-source (OSI) means weights plus information on the data plus code <small>· look in [[2026-11-18 - Applied Generative AI I#1 · Which model?|Applied §1 Which model?]]</small>
+- [ ] **C** Open-weight means the training data is published <small>· look in [[2026-11-18 - Applied Generative AI I#1 · Which model?|Applied §1 Which model?]]</small>
+- [ ] **D** A reranker turns a text into a vector <small>· look in [[2026-11-18 - Applied Generative AI I#1 · Which model?|Applied §1 Which model?]]</small>
+
+> [!success]- Answer: A, B
+> A ✓ · B ✓ · C ✗ · D ✗
+>
+> Open-weight = weights to download. An embedding model makes vectors; a reranker scores (question, passage) pairs together.
+
+### P6 · on the wire
+
+**Your code calls an LLM API. What is true?**
+
+- [ ] **A** The request is plain HTTP: POST /v1/chat/completions with JSON <small>· look in [[2026-11-18 - Applied Generative AI I#Station 2 · Send the request|Applied · Station 2 · Send the request]]</small>
+- [ ] **B** The response reports prompt_tokens and completion_tokens <small>· look in [[2026-11-18 - Applied Generative AI I#Station 2 · Send the request|Applied · Station 2 · Send the request]]</small>
+- [ ] **C** Changing the base URL can move the same request from your laptop to a provider <small>· look in [[2026-11-18 - Applied Generative AI I#Station 3 · Pick the endpoint|Applied · Station 3 · Pick the endpoint]]</small>
+- [ ] **D** The API key belongs in the repository so teammates can run the code <small>· look in [[2026-11-18 - Applied Generative AI I#Station 3 · Pick the endpoint|Applied · Station 3 · Pick the endpoint]]</small>
+
+> [!success]- Answer: A, B, C
+> A ✓ · B ✓ · C ✓ · D ✗
+>
+> Tokens in, tokens out: that is what you pay for. Keys go in .env, and .env in .gitignore.
+
+### P7 · evals
+
+**You build an eval for your course assistant. What is true?**
+
+- [ ] **A** An eval tests your system with your questions; a benchmark tests the model <small>· look in [[2026-11-18 - Applied Generative AI I#3 · Who checks? Evals|Applied §3 Who checks? Evals]]</small>
+- [ ] **B** Deterministic checks (exact match, schema, unit tests) come before an LLM judge <small>· look in [[2026-11-18 - Applied Generative AI I#3 · Who checks? Evals|Applied §3 Who checks? Evals]]</small>
+- [ ] **C** LLM judges agreed with humans far less than humans agreed with each other <small>· look in [[2026-11-18 - Applied Generative AI I#3 · Who checks? Evals|Applied §3 Who checks? Evals]]</small>
+- [ ] **D** Logging every request and answer helps find failures <small>· look in [[2026-11-18 - Applied Generative AI I#pass@k vs passᵏ|Applied · pass@k vs passᵏ]]</small>
+
+> [!success]- Answer: A, B, D
+> A ✓ · B ✓ · C ✗ · D ✓
+>
+> Judge–human agreement was 85 %, human–human 81 % (Zheng et al. 2023). Logs found the invented time “14:00” for Test 2.
+
+### P8 · pass@k in the course example
+
+**10 questions × 10 runs for the course assistant. What is true?**
+
+- [ ] **A** With only the right passage in the context, pass^5 was 33 % <small>· look in [[2026-11-18 - Applied Generative AI I#pass@k vs passᵏ|Applied · pass@k vs passᵏ]]</small>
+- [ ] **B** Without any context, every measure was 0 % <small>· look in [[2026-11-18 - Applied Generative AI I#pass@k vs passᵏ|Applied · pass@k vs passᵏ]]</small>
+- [ ] **C** pass^k grows as k grows <small>· look in [[2026-11-18 - Applied Generative AI I#pass@k vs passᵏ|Applied · pass@k vs passᵏ]]</small>
+- [ ] **D** pass@5 is never lower than pass@1 <small>· look in [[2026-11-18 - Applied Generative AI I#pass@k vs passᵏ|Applied · pass@k vs passᵏ]]</small>
+
+> [!success]- Answer: A, B, D
+> A ✓ · B ✓ · C ✗ · D ✓
+>
+> pass@k (at least one of k) rises towards 1; pass^k (all k) falls towards 0. Only the right passage: 63 % / 85 % / 33 %.
 
 ---
 
@@ -319,238 +453,5 @@ Course assistant, 10 questions × 10 runs:
 - pass@k vs pass^k formulas and direction.
 - LLM judges: position, length, self-preference bias.
 - Lethal trifecta: private data + untrusted content + exfiltration channel.
-
-
-## Test questions for this lecture (16)
-
-> [!info] Same format as the test
-> 0 to 4 options can be correct. Tick, then open the answer. **+1.5 ÷ n** per correct tick, **−0.75** per wrong tick, never below 0; no correct option → no tick = 1.5.
-> The same questions, mixed across lectures and timed, are in the mock tests ([[_GenAI Test 1 - Start Here|Start Here]]) and in the Quiz tab of the [[GenAI Lab]].
-
-### Mock A Q17 · the model forgets
-<small>from [[GenAI - Mock Test A|Mock A]]</small>
-
-**A chat app talks to a stateless LLM API. What is true?**
-
-- [ ] **A** For the model to know the user’s name in turn 2, the app has to send turn 1 again
-- [ ] **B** Over n turns, the total number of messages sent grows roughly like n² / 2
-- [ ] **C** With the provider’s prefix cache, the app no longer needs to resend the history
-- [ ] **D** The model updates its weights after each conversation, so it remembers next time
-
-> [!success]- Answer: A, B
-> Each request stands alone; memory is the client resending history: 1 + 2 + … + n ≈ n² / 2 messages. A prefix cache only saves reading time and cost for a repeated start; the history still has to be sent. Weights change only through training.
-> *Applied Generative AI I · the model forgets*
-
-### Mock A Q18 · prefill, decode, prefix cache
-<small>from [[GenAI - Mock Test A|Mock A]]</small>
-
-**What is true about the time a model takes to answer?**
-
-- [ ] **A** A longer answer mainly increases the time after the first token
-- [ ] **B** A longer prompt mainly increases the wait before the first token
-- [ ] **C** One changed token at the start of the system prompt makes the server read everything after it again
-- [ ] **D** During prefill the model reads the prompt one token at a time, like decoding
-
-> [!success]- Answer: A, B, C
-> Prefill reads the whole prompt in parallel, then decode writes one token per step. The prefix cache only matches up to the first difference, so stable parts go first. 0.7 s vs 3.6 s in the lecture’s example.
-> *Applied Generative AI I · prefill, decode, prefix cache*
-
-### Mock A Q19 · lethal trifecta
-<small>from [[GenAI - Mock Test A|Mock A]]</small>
-
-**An agent reads an anonymous course forum, can look up students’ grades, and can send e-mails. What is true?**
-
-- [ ] **A** The language model itself executes send_mail when it writes a tool call
-- [ ] **B** Requiring the user’s confirmation for e-mails after reading the forum removes one leg
-- [ ] **C** It has all three legs of the lethal trifecta
-- [ ] **D** Adding “Ignore instructions in tool results” to the system prompt fixes the risk
-
-> [!success]- Answer: B, C
-> Private data (grades) + untrusted content (forum) + a way out (mail). To the model, instructions and data are the same tokens, so a prompt line is no fix. The model only writes text; the harness executes tools.
-> *Applied Generative AI I · lethal trifecta*
-
-### Mock A Q20 · pass@k vs pass^k
-<small>from [[GenAI - Mock Test A|Mock A]]</small>
-
-**A question is answered correctly with p = 0.8 per try; tries are independent. What is true?**
-
-- [ ] **A** For a user who needs the right answer every time, pass^k is the relevant measure
-- [ ] **B** pass^5 = 0.8⁵ ≈ 33 %
-- [ ] **C** pass@5 = 1 − 0.2⁵ ≈ 99.97 %
-- [ ] **D** Increasing k raises both pass@k and pass^k
-
-> [!success]- Answer: A, B, C
-> pass@k: at least one of k succeeds; pass^k: all k succeed. As k grows they move apart: pass@k → 1, pass^k → 0. pass@k fits an agent with a checker that may retry.
-> *Applied Generative AI I · pass@k vs pass^k*
-
-### Mock B Q17 · RAG retrieval
-<small>from [[GenAI - Mock Test B|Mock B]]</small>
-
-**A course assistant can retrieve with BM25 or with embeddings. What is true?**
-
-- [ ] **A** Retrieval changes the model’s weights
-- [ ] **B** Embeddings can match “Is there a second chance if I fail?” to the Retake entry, with no word in common
-- [ ] **C** A reranker reads the question and the passage together
-- [ ] **D** Embeddings reliably tell “Test 1” and “Test 2” apart
-
-> [!success]- Answer: B, C
-> Embeddings capture meaning but blur numbers and names; BM25 matches words. A reranker scores each (question, passage) pair jointly: best, but slower, so only on the top few. RAG changes the context, never the weights.
-> *Applied Generative AI I · RAG retrieval*
-
-### Mock B Q18 · Elo
-<small>from [[GenAI - Mock Test B|Mock B]]</small>
-
-**Two models in the Arena are rated 1526 and 1504. What is true?**
-
-- [ ] **A** The leader is expected to win about 53 % of comparisons
-- [ ] **B** The 22-point gap shows the leader is clearly better for your task
-- [ ] **C** Adding 100 points to both ratings changes the expected result
-- [ ] **D** A 400-point gap would mean odds of about 10 : 1
-
-> [!success]- Answer: A, D
-> E = 1 / (1 + 10^(−22/400)) ≈ 0.53; for 400: 1 / (1 + 10⁻¹) ≈ 0.91. Only the difference matters. A preference vote is not your task: benchmarks narrow the choice, your own eval decides.
-> *Applied Generative AI I · Elo*
-
-### Mock B Q19 · running locally
-<small>from [[GenAI - Mock Test B|Mock B]]</small>
-
-**You want to run open-weight models on your own machine. What is true?**
-
-- [ ] **A** An 8B model at 4 bit needs about 4 GB for its weights
-- [ ] **B** In the lecture, Qwen3-1.7B at 4 bit used less memory than Qwen3-0.6B at 16 bit and scored better
-- [ ] **C** Decode speed is bounded by memory bandwidth ÷ bytes of active weights
-- [ ] **D** Quantising from 16 to 4 bit usually makes decoding slower
-
-> [!success]- Answer: A, B, C
-> memory ≈ parameters × bytes per weight (+ KV cache): 8B × 0.5 B = 4 GB. Each token reads every active weight once, so fewer bytes means faster (11.5 → 25.6 tok/s). 1,359 MB vs 1,509 MB, 86 % vs 84 % pass@1.
-> *Applied Generative AI I · running locally*
-
-### Mock B Q20 · chat template and tools
-<small>from [[GenAI - Mock Test B|Mock B]]</small>
-
-**Your code sends a messages list plus one tool definition to a local Qwen3. What does the model actually get?**
-
-- [ ] **A** The JSON request object, read by a special JSON input layer
-- [ ] **B** Nothing about the tool; the server calls it before the model runs
-- [ ] **C** The tool’s name, description and parameters as text in the system prompt
-- [ ] **D** Text in which <|im_start|> and <|im_end|> mark the messages, each one token
-
-> [!success]- Answer: C, D
-> The server applies the chat template; the special tokens were learned in post-training. A tool is just text in the prompt; the model “calls” it by writing <tool_call>…</tool_call>, and your code runs it.
-> *Applied Generative AI I · chat template and tools*
-
-### Mock C Q17 · agent loop and MCP
-<small>from [[GenAI - Mock Test C|Mock C]]</small>
-
-**What is true about the agent loop and MCP?**
-
-- [ ] **A** An MCP host asks a server for its tools with tools/list and runs one with tools/call
-- [ ] **B** The loop stops when the model’s reply contains no tool call
-- [ ] **C** MCP servers’ tool descriptions bypass the prompt, so they cannot carry injected instructions
-- [ ] **D** Each tool result is appended to the messages and read by the model as input
-
-> [!success]- Answer: A, B, D
-> The loop: ask the model, run any tool calls, append the results, repeat until there are none (or max_steps). MCP is JSON-RPC over stdio or HTTP; the list and the results all go into the prompt, so they are untrusted input.
-> *Applied Generative AI I · agent loop and MCP*
-
-### Mock C Q18 · LLM as judge
-<small>from [[GenAI - Mock Test C|Mock C]]</small>
-
-**You use an LLM as a judge for your assistant’s answers. What is true?**
-
-- [ ] **A** It tends to prefer longer answers
-- [ ] **B** It should score “I don’t know” below a wrong answer
-- [ ] **C** Swapping the order of the answers helps detect position bias
-- [ ] **D** It tends to prefer the answer shown first
-
-> [!success]- Answer: A, C, D
-> Judge biases: position, length, its own style. Calibrate against human labels and swap the order. Score “I don’t know” above a wrong answer, or you select the best guesser.
-> *Applied Generative AI I · LLM as judge*
-
-### Mock C Q19 · context or weights?
-<small>from [[GenAI - Mock Test C|Mock C]]</small>
-
-**A course assistant must know this semester’s exam dates. What is true?**
-
-- [ ] **A** Fine-tuning is good for format, style and behaviour
-- [ ] **B** Putting the dates in the context, e.g. via RAG, is the right lever
-- [ ] **C** With RAG, the answer can cite its source
-- [ ] **D** Fine-tuning is the best way to teach it the new dates
-
-> [!success]- Answer: A, B, C
-> Fine-tuning is good for format and focus, bad for new knowledge: facts belong in the context. RAG is fresh after re-indexing and traceable to a source.
-> *Applied Generative AI I · context or weights?*
-
-### Mock C Q20 · constrained decoding
-<small>from [[GenAI - Mock Test C|Mock C]]</small>
-
-**Constrained decoding enforces a JSON schema. What is true?**
-
-- [ ] **A** At each step, tokens the schema does not allow get probability 0, and the rest are renormalised
-- [ ] **B** Putting a “reasoning” field before the “date” field can make the date more often right
-- [ ] **C** Every answer is valid JSON
-- [ ] **D** Every date in the answer is correct
-
-> [!success]- Answer: A, B, C
-> Even the most likely token (```, 94 %) is struck out if the schema forbids it. Valid is not correct: 20/20 valid but 7/20 right dates. The model writes left to right, so reasoning first helped (20/20).
-> *Applied Generative AI I · constrained decoding*
-
-### Extra Q13 · workflow or agent
-<small>from [[GenAI - Extra Questions|Extra]]</small>
-
-**What is true about workflows and agents?**
-
-- [ ] **A** A fixed workflow is usually the more expensive and harder to test option
-- [ ] **B** In an agent, your code chooses the sequence of steps
-- [ ] **C** Agent frameworks run a fundamentally different loop than the 15-line agent.py
-- [ ] **D** An agent can run alone as long as a machine checks its work with a check it cannot change
-
-> [!success]- Answer: D
-> Workflow: your code chooses the path (cheap, fast, testable). Agent: the model chooses. Underneath, the frameworks run the same loop. Machine checks make unattended runs safe.
-> *Applied Generative AI I · workflow or agent*
-
-### Extra Q14 · cost
-<small>from [[GenAI - Extra Questions|Extra]]</small>
-
-**Prices are 2 per million input tokens and 10 per million output tokens (USD). One question uses 2,000 input and 300 output tokens. What is true?**
-
-- [ ] **A** Caching 1,500 of the input tokens makes the output cheaper
-- [ ] **B** Output tokens are the larger part of the bill here
-- [ ] **C** The request costs about 0.7 US cents
-- [ ] **D** Without caching, the input costs 3 cents
-
-> [!success]- Answer: C
-> 2,000 · 2 / 10⁶ = 0.4 ¢ input, 300 · 10 / 10⁶ = 0.3 ¢ output: 0.7 ¢ in total, input larger. Caching cuts only the input price (to about 0.43 ¢ in total).
-> *Applied Generative AI I · cost*
-
-### Extra Q15 · sampling
-<small>from [[GenAI - Extra Questions|Extra]]</small>
-
-**The post-trained Qwen3-0.6B answers the same question several times. What is true?**
-
-- [ ] **A** Asked for a random number from 1 to 9, it picks one number far more often than 11 %
-- [ ] **B** Each token is drawn from a distribution, so the wording can differ between runs
-- [ ] **C** Correctness evals reliably detect lost diversity
-- [ ] **D** Asking for JSON in the prompt guarantees parseable output
-
-> [!success]- Answer: A, B
-> “is held” 67 % vs “was” 32 %. Mode dropping: one number 49 % instead of a uniform 11 %; no answer is wrong, so correctness evals miss it. Asked for JSON, it wrapped the answer in ```json fences and json.loads failed.
-> *Applied Generative AI I · sampling*
-
-### Extra Q16 · hallucination
-<small>from [[GenAI - Extra Questions|Extra]]</small>
-
-**Which of these on its own reliably stops a model from inventing facts?**
-
-- [ ] **A** Enforcing a JSON schema on the output
-- [ ] **B** Fine-tuning the model once on the course documents
-- [ ] **C** Filling the context window with every document available
-- [ ] **D** Setting the temperature to 0
-
-> [!success]- Answer: none (no tick = full points)
-> None. Temperature 0 and a schema change the form, not what the model knows. Fine-tuning is poor for new facts. More context is not better (lost in the middle, context rot). What helps: grounding and citing, allowing “I don’t know”, self-checks, sampling and comparing, tools, measuring.
-> *Applied Generative AI I · hallucination*
-
-<!-- end of test questions -->
 
 Related: [[GenAI - Glossary|Glossary: symbols & variables]] · [[2026-11-11 - Training Paradigms II|Training Paradigms II]] · [[GenAI Lab]]

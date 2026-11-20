@@ -7,10 +7,13 @@ site: none
 course: Generative AI (194.207)
 ---
 
-# 04 · Training Paradigms II (11 Nov): mid-training & post-training
+# 04 · Training Paradigms II (11 Nov) – mid-training & post-training
 
 > [!abstract] The story
-> Pre-training produced a base model that continues text. **Mid-training** (step 4) does three things at the end of pre-training: **① cool down the learning rate, ② finish on the best data, ③ extend the context** (4,096 → 1M). **Post-training** (step 5) turns the base model into an assistant, either by learning from **a dataset** (SFT: examples to copy; DPO: pairs, one better) or from **its own output**, scored by a **teacher** (on-policy distillation), a **reward model / judge** (RLHF, RLAIF) or a **checker** (RLVR). The RL methods differ in where the **baseline** comes from: **PPO** (value model) vs **GRPO** (group mean).
+> - Pre-training produced a base model that continues text.
+> - **Mid-training** (step 4) does three things at the end of pre-training: **① cool down the learning rate, ② finish on the best data, ③ extend the context** (4,096 → 1M).
+> - **Post-training** (step 5) turns the base model into an assistant, either by learning from **a dataset** (SFT: examples to copy; DPO: pairs, one better) or from **its own output**, scored by a **teacher** (on-policy distillation), a **reward model / judge** (RLHF, RLAIF) or a **checker** (RLVR).
+> - The RL methods differ in where the **baseline** comes from: **PPO** (value model) vs **GRPO** (group mean).
 
 > [!info] No 5w1h page for this lecture
 > Part of the long-context material (attention cost, KV cache, GQA, MLA, "four ways") is on the [Training Paradigms 5w1h page](https://5w1h.academy/introduction-to-generative-ai/module-01/training-paradigms/#sec:context-later), embedded below. For everything else, use the **KV cache**, **DPO / RM**, **KL**, **PPO / GRPO** and **YaRN** tabs of [[GenAI Lab]].
@@ -25,8 +28,10 @@ course: Generative AI (194.207)
 
 With a warmup–stable–decay schedule the loss landscape picture is: **travel** (high LR, big jumps across the landscape) → **bounce** (still high LR, bouncing between the walls of a valley) → **settle** (LR decays → steps get small → slides to the bottom). The decay phase gives a big loss drop and is the natural place to switch data.
 
-> [!example]+ Slide 39
-> ![[GenAI-L4-slajd39.png|760]]
+> [!example]- Slide 39 (click to open)
+> ![[GenAI-L4-slajd39.png|720]]
+
+---
 
 ## A2 · Finish on the best data
 
@@ -42,10 +47,12 @@ answer: 408
 
 Why: the model then already *sometimes* produces correct reasoning, and RL later only has to make the good behaviour more likely ("after mid-training: some ✓ → after RL: mostly ✓"). RL can only reinforce what the model can already sample.
 
-> [!example]+ Slide 40
-> ![[GenAI-L4-slajd40.png|760]]
+> [!example]- Slide 40 (click to open)
+> ![[GenAI-L4-slajd40.png|720]]
 
-## A3 · Extend the context: 4,096 → 1,000,000
+---
+
+## A3 · Extend the context – 4,096 → 1,000,000
 
 Three obstacles, three fixes:
 
@@ -55,10 +62,10 @@ Three obstacles, three fixes:
 | **2 Positions**: RoPE never saw angles beyond the training length | stretch the positions (YaRN) | **in mid-training** |
 | **3 Training data**: very few long documents (most docs are ≤ 4K) | train on long rows, at the end | **in mid-training** |
 
-> [!example]+ Slide 42
-> ![[GenAI-L4-slajd42.png|760]]
+> [!example]- Slide 42 (click to open)
+> ![[GenAI-L4-slajd42.png|720]]
 
-### Excursus: attention cost and the KV cache
+### Excursus – attention cost and the KV cache
 
 Training/prefill: $\text{softmax}(QK^\top/\sqrt{d_k})V$ with $Q,K \in \mathbb{R}^{n\times d_k}$ → an **$n\times n$** weight matrix per head and layer.
 
@@ -106,22 +113,22 @@ Cache 512 numbers instead of 2 × 16,384 → **64× smaller**. Trick: $W^{UK}$ c
 
 (Slide sources: MiniMax-M2, DeepSeek, Olmo 3, DeepSeek-V4, Kimi K3. Frontier models mix several of these across layers.)
 
-> [!example]+ Slides 43, 44, 45, 46, 47
-> ![[GenAI-L4-slajd43.png|760]]
->
-> ![[GenAI-L4-slajd44.png|760]]
->
-> ![[GenAI-L4-slajd45.png|760]]
->
-> ![[GenAI-L4-slajd46.png|760]]
->
-> ![[GenAI-L4-slajd47.png|760]]
+**Try it: KV cache size: GQA and MLA**
 
-<iframe src="https://jerzyszyjut.github.io/notes/university/notes/genai/genai-lab.htm#kvcache" width="100%" height="860" loading="lazy" style="border:1px solid #8884; border-radius:8px;"></iframe>
+<iframe src="https://jerzyszyjut.github.io/notes/university/notes/genai/genai-lab.htm?tool=kvcache" width="100%" height="640" loading="lazy" style="border:1px solid #8884; border-radius:8px;"></iframe>
 
-*Interactive: **KV cache** tab of the [[GenAI Lab]] · [[genai-lab.htm|open it full screen]]*
+> [!example]- Slides 43, 44, 45, 46, 47 (click to open)
+> ![[GenAI-L4-slajd43.png|720]]
+>
+> ![[GenAI-L4-slajd44.png|720]]
+>
+> ![[GenAI-L4-slajd45.png|720]]
+>
+> ![[GenAI-L4-slajd46.png|720]]
+>
+> ![[GenAI-L4-slajd47.png|720]]
 
-### Stretching the positions: YaRN
+### Stretching the positions – YaRN
 
 RoPE pair $i$ turns by $\theta_i=b^{-2(i-1)/d}$ per position. Olmo 3 7B ($b$ = 500,000, head dim 128 → 64 pairs), trained on 8K rows:
 
@@ -135,12 +142,12 @@ RoPE pair $i$ turns by $\theta_i=b^{-2(i-1)/d}$ per position. Olmo 3 7B ($b$ = 5
 
 **Why:** at position 50K a slow pair would reach angles the model never saw → garbage. Dividing its speed by the scale factor 8 maps 0–64K into the angle range seen in 0–8K (**interpolation**). Fast pairs are left alone (they carry fine **local** order and have seen all angles anyway). Rule (YaRN default thresholds): pairs with > 32 turns in the training length: untouched; < 1 turn: ÷ scale; in between: blended. Olmo 3: 19 fast pairs untouched, 16 partly, 29 slow ÷8. (Plain *position interpolation* would divide **all** pairs by 8 → blurs nearby order.)
 
-> [!example]+ Slide 48
-> ![[GenAI-L4-slajd48.png|760]]
+**Try it: YaRN: which pairs get slowed down**
 
-<iframe src="https://jerzyszyjut.github.io/notes/university/notes/genai/genai-lab.htm#rope" width="100%" height="860" loading="lazy" style="border:1px solid #8884; border-radius:8px;"></iframe>
+<iframe src="https://jerzyszyjut.github.io/notes/university/notes/genai/genai-lab.htm?tool=yarn" width="100%" height="760" loading="lazy" style="border:1px solid #8884; border-radius:8px;"></iframe>
 
-*Interactive: **RoPE & YaRN** tab of the [[GenAI Lab]] · [[genai-lab.htm|open it full screen]]*
+> [!example]- Slide 48 (click to open)
+> ![[GenAI-L4-slajd48.png|720]]
 
 ### Long rows, at the end (Olmo 3)
 
@@ -151,10 +158,10 @@ RoPE pair $i$ turns by $\theta_i=b^{-2(i-1)/d}$ per position. Olmo 3 7B ($b$ = 5
 
 Extension factors reported: Olmo 3 7B ×8 (1 step), DeepSeek-V3 ×32 (2 steps), Llama 3 ×16 (6 stages), GLM-5 ×6 (2 steps), DeepSeek-V4 ×256 to 1M **in pre-training**. 1M is today's frontier, reached with new attention.
 
-> [!example]+ Slides 49, 50
-> ![[GenAI-L4-slajd49.png|760]]
+> [!example]- Slides 49, 50 (click to open)
+> ![[GenAI-L4-slajd49.png|720]]
 >
-> ![[GenAI-L4-slajd50.png|760]]
+> ![[GenAI-L4-slajd50.png|720]]
 
 ---
 
@@ -173,10 +180,12 @@ flowchart TD
   C --> B
 ```
 
-> [!example]+ Slide 74
-> ![[GenAI-L4-slajd74.png|760]]
+> [!example]- Slide 74 (click to open)
+> ![[GenAI-L4-slajd74.png|720]]
 
-## B1 · SFT: examples to copy
+---
+
+## B1 · SFT – examples to copy
 
 Ordinary next-token loss, on (prompt, answer) pairs. Where the answers come from:
 - **curated dataset**: people write them,
@@ -185,7 +194,9 @@ Ordinary next-token loss, on (prompt, answer) pairs. Where the answers come from
 
 The model only learns to **imitate**; it never sees what a *bad* answer looks like.
 
-## B2 · DPO: pairs, one better
+---
+
+## B2 · DPO – pairs, one better
 
 **Where "chosen" comes from:** people compare (InstructGPT: rank 4–9 answers) · a model judges (Tülu 3: GPT-4o rates) · bigger model's answer wins (Olmo 3: Qwen3-32B's answer is "chosen" over Qwen3-0.6B's). **Labelled once: a fixed dataset** (offline, no sampling during training).
 
@@ -208,14 +219,16 @@ Note the policy actually gives the *rejected* answer a higher absolute log-prob 
 
 DPO needs **no reward model and no sampling**: only policy + frozen reference + a fixed preference dataset.
 
-> [!example]+ Slide 58
-> ![[GenAI-L4-slajd58.png|760]]
+**Try it: DPO loss**
 
-<iframe src="https://jerzyszyjut.github.io/notes/university/notes/genai/genai-lab.htm#post" width="100%" height="860" loading="lazy" style="border:1px solid #8884; border-radius:8px;"></iframe>
+<iframe src="https://jerzyszyjut.github.io/notes/university/notes/genai/genai-lab.htm?tool=dpo" width="100%" height="520" loading="lazy" style="border:1px solid #8884; border-radius:8px;"></iframe>
 
-*Interactive: **DPO · RM · KL** tab of the [[GenAI Lab]] · [[genai-lab.htm|open it full screen]]*
+> [!example]- Slide 58 (click to open)
+> ![[GenAI-L4-slajd58.png|720]]
 
-## B3 · On-policy distillation: a teacher, token by token
+---
+
+## B3 · On-policy distillation – a teacher, token by token
 
 The **student (policy)** writes its own answer ("17 × 24 = 418"). The **teacher** does **one forward pass** over the student's text and gives its probability for each of the student's tokens.
 
@@ -229,10 +242,16 @@ $$\text{grade}_t=\log p_{teacher}(\text{token}_t)-\log p_{student}(\text{token}_
 
 "Grade held fixed": the grade is treated as a constant **reward per token** (no gradient flows through it). Advantages: on-policy (learns on its own mistakes, unlike SFT/offline distillation), and **dense** feedback for every token (unlike a single reward at the end).
 
-> [!example]+ Slide 60
-> ![[GenAI-L4-slajd60.png|760]]
+**Try it: On-policy distillation grades**
 
-## B4 · RLHF: a reward model
+<iframe src="https://jerzyszyjut.github.io/notes/university/notes/genai/genai-lab.htm?tool=distill" width="100%" height="440" loading="lazy" style="border:1px solid #8884; border-radius:8px;"></iframe>
+
+> [!example]- Slide 60 (click to open)
+> ![[GenAI-L4-slajd60.png|720]]
+
+---
+
+## B4 · RLHF – a reward model
 
 **① Train the reward model** (Bradley–Terry). People rank several answers (e.g. 4 → $\binom42=6$ pairs: 1>2, 1>3, 1>4, 2>3, 2>4, 3>4). For each pair:
 
@@ -259,19 +278,31 @@ The **reference is frozen** (the SFT model); the **reward model is frozen** duri
 
 **RLAIF:** the labels come from an AI judge guided by a **constitution written by people** (< \$0.01 per label). Rubric per prompt (gives a reason ✓, names calves/herd ✓, mentions other reasons ✗, short ✓) → 0.75 vs 0.25.
 
-> [!example]+ Slides 63, 67, 65, 66
-> ![[GenAI-L4-slajd63.png|760]]
->
-> ![[GenAI-L4-slajd67.png|760]]
->
-> ![[GenAI-L4-slajd65.png|760]]
->
-> ![[GenAI-L4-slajd66.png|760]]
+**Try it: Reward model loss**
 
-## B5 · RLVR: a checker
+<iframe src="https://jerzyszyjut.github.io/notes/university/notes/genai/genai-lab.htm?tool=rm" width="100%" height="470" loading="lazy" style="border:1px solid #8884; border-radius:8px;"></iframe>
+
+**Try it: KL and the KL-penalised reward**
+
+<iframe src="https://jerzyszyjut.github.io/notes/university/notes/genai/genai-lab.htm?tool=kl" width="100%" height="560" loading="lazy" style="border:1px solid #8884; border-radius:8px;"></iframe>
+
+> [!example]- Slides 63, 67, 65, 66 (click to open)
+> ![[GenAI-L4-slajd63.png|720]]
+>
+> ![[GenAI-L4-slajd67.png|720]]
+>
+> ![[GenAI-L4-slajd65.png|720]]
+>
+> ![[GenAI-L4-slajd66.png|720]]
+
+---
+
+## B5 · RLVR – a checker
 
 Reward = **1 / 0 from a program**, no reward model: maths (final answer = 408?), code (unit tests in a sandbox), instructions (constraints: under 50 words, no commas – a script checks), puzzles (generated, answer known), format (valid JSON, right tool call).
 Works when correctness is **verifiable**. Not for: poems, comforting a friend, summaries, "is this joke funny?" → those need RLHF/RLAIF.
+
+---
 
 ## B6 · Why not just the reward? The baseline
 
@@ -281,8 +312,10 @@ $$\mathcal{L}=-(r-b)\cdot\sum_t\log p(\text{token}_t)$$
 
 With $b$ = mean = 0.425: +0.375, +0.075, −0.125, −0.325 → better-than-average pushed up, worse pushed **down**; lower variance. *Where does $b$ come from?* → PPO or GRPO.
 
-> [!example]+ Slide 73
-> ![[GenAI-L4-slajd73.png|760]]
+> [!example]- Slide 73 (click to open)
+> ![[GenAI-L4-slajd73.png|720]]
+
+---
 
 ## B7 · PPO
 
@@ -302,12 +335,14 @@ $$\mathcal{L}=-\sum_t\min\big(\rho_tA_t,\ \text{clip}(\rho_t,1-\varepsilon,1+\va
 
 Why the ratio and clip: we reuse one batch of samples for several gradient steps; once a token's probability has moved > 20% from when it was sampled, the clipped term stops giving gradient → no single update moves the policy too far. The $\min$ makes it pessimistic (only clips in the direction that would help).
 
-> [!example]+ Slide 75
-> ![[GenAI-L4-slajd75.png|760]]
+**Try it: PPO ratio, clip and returns**
 
-<iframe src="https://jerzyszyjut.github.io/notes/university/notes/genai/genai-lab.htm#rl" width="100%" height="860" loading="lazy" style="border:1px solid #8884; border-radius:8px;"></iframe>
+<iframe src="https://jerzyszyjut.github.io/notes/university/notes/genai/genai-lab.htm?tool=ppo" width="100%" height="780" loading="lazy" style="border:1px solid #8884; border-radius:8px;"></iframe>
 
-*Interactive: **PPO · GRPO** tab of the [[GenAI Lab]] · [[genai-lab.htm|open it full screen]]*
+> [!example]- Slide 75 (click to open)
+> ![[GenAI-L4-slajd75.png|720]]
+
+---
 
 ## B8 · GRPO (DeepSeekMath)
 
@@ -317,8 +352,12 @@ $$A_i=\frac{r_i-\text{mean}(r)}{\text{std}(r)},\qquad \mathcal{L}=-\sum_{i,t}\Bi
 
 Example: $r$ = 0.8, 0.5, 0.3, 0.1 → mean 0.425, std 0.259 → $A$ = **+1.45, +0.29, −0.48, −1.25**. **Every token of answer $i$ gets the same $A_i$**. $\beta=0.04$, KL now **in the loss**.
 
-> [!example]+ Slide 77
-> ![[GenAI-L4-slajd77.png|760]]
+**Try it: GRPO group advantages**
+
+<iframe src="https://jerzyszyjut.github.io/notes/university/notes/genai/genai-lab.htm?tool=grpo" width="100%" height="520" loading="lazy" style="border:1px solid #8884; border-radius:8px;"></iframe>
+
+> [!example]- Slide 77 (click to open)
+> ![[GenAI-L4-slajd77.png|720]]
 
 ### PPO vs GRPO
 
@@ -335,8 +374,130 @@ Example: $r$ = 0.8, 0.5, 0.3, 0.1 → mean 0.425, std 0.259 → $A$ = **+1.45, +
 > [!warning] GRPO edge case
 > If all $G$ answers get the same reward (all right or all wrong), std = 0 and every $A_i=0$ → **no learning signal** from that prompt. Prompts must be neither too easy nor too hard.
 
-> [!example]+ Slide 78
-> ![[GenAI-L4-slajd78.png|760]]
+> [!example]- Slide 78 (click to open)
+> ![[GenAI-L4-slajd78.png|720]]
+
+---
+
+## Practice questions (8)
+
+> [!info] Same format as the test
+> 0 to 4 options can be correct: decide each option on its own, true or false. Next to each option is the section above that answers it.
+> Full timed tests: [[GenAI - Mock Test A|Mock A]] · [[GenAI - Mock Test B|Mock B]] · [[GenAI - Mock Test C|Mock C]] · [[GenAI - Mock Test D|Mock D]] (their questions are not repeated here).
+
+### P1 · the KV cache: prefill and decode
+<small>from the official example sheet</small>
+
+**A model generates text one token at a time, with a standard KV cache. What happens for each new token?**
+
+- [ ] **A** Only the new token goes through all the layers <small>· look in [[2026-11-11 - Training Paradigms II#Excursus – attention cost and the KV cache|TP II · Excursus]]</small>
+- [ ] **B** Its query is compared with the cached keys of all earlier tokens <small>· look in [[2026-11-11 - Training Paradigms II#Excursus – attention cost and the KV cache|TP II · Excursus]]</small>
+- [ ] **C** Its key and value are stored in the cache for later tokens <small>· look in [[2026-11-11 - Training Paradigms II#Excursus – attention cost and the KV cache|TP II · Excursus]]</small>
+- [ ] **D** The keys of earlier tokens are updated to include the new token <small>· look in [[2026-11-11 - Training Paradigms II#Excursus – attention cost and the KV cache|TP II · Excursus]]</small>
+
+> [!success]- Answer: A, B, C
+> A ✓ · B ✓ · C ✓ · D ✗
+>
+> Earlier tokens are needed only inside attention, through their keys and values. Because of the mask, a token never sees later tokens, so its key and value never change.
+
+### P2 · RLHF: over-optimization, KL, the loop
+<small>from the official example sheet</small>
+
+**Why does RLHF penalize the policy with β · KL to the reference model?**
+
+- [ ] **A** It stops the policy from optimizing the reward model’s score too far <small>· look in [[2026-11-11 - Training Paradigms II#B4 · RLHF – a reward model|TP II §B4 RLHF]]</small>
+- [ ] **B** It keeps the policy close to the SFT model it started from <small>· look in [[2026-11-11 - Training Paradigms II#B4 · RLHF – a reward model|TP II §B4 RLHF]]</small>
+- [ ] **C** It keeps the reward model close to its weights from before RL <small>· look in [[2026-11-11 - Training Paradigms II#B4 · RLHF – a reward model|TP II §B4 RLHF]]</small>
+- [ ] **D** It rewards the policy for tokens the reference model finds unlikely <small>· look in [[2026-11-11 - Training Paradigms II#B4 · RLHF – a reward model|TP II §B4 RLHF]]</small>
+
+> [!success]- Answer: A, B
+> A ✓ · B ✓ · C ✗ · D ✗
+>
+> If the policy chases the reward model too far, its score keeps rising while the real quality goes up and then down. The KL term pulls the policy back towards the frozen SFT model, harder the further it moves. The reward model does not change during RL.
+
+### P3 · cool-down
+
+**Mid-training with a warmup–stable–decay schedule. What is true?**
+
+- [ ] **A** The decay phase gives a big drop in loss <small>· look in [[2026-11-11 - Training Paradigms II#A1 · Cool down the learning rate|TP II §A1 Cool down the learning rate]]</small>
+- [ ] **B** The decay phase is a natural place to switch to the best data <small>· look in [[2026-11-11 - Training Paradigms II#A1 · Cool down the learning rate|TP II §A1 Cool down the learning rate]]</small>
+- [ ] **C** The learning rate is highest at the end of training <small>· look in [[2026-11-11 - Training Paradigms II#A1 · Cool down the learning rate|TP II §A1 Cool down the learning rate]]</small>
+- [ ] **D** “Bounce”: the learning rate is still high and the steps jump between the walls of a valley <small>· look in [[2026-11-11 - Training Paradigms II#A1 · Cool down the learning rate|TP II §A1 Cool down the learning rate]]</small>
+
+> [!success]- Answer: A, B, D
+> A ✓ · B ✓ · C ✗ · D ✓
+>
+> Travel → bounce → settle: once the learning rate decays, the steps get small and the model slides to the bottom of the valley.
+
+### P4 · three obstacles to long context
+
+**Going from 4,096 to 1M tokens of context. What is true?**
+
+- [ ] **A** The attention cost grows quadratically with the number of tokens <small>· look in [[2026-11-11 - Training Paradigms II#A3 · Extend the context – 4,096 → 1,000,000|TP II §A3 Extend the context]]</small>
+- [ ] **B** Positions beyond the training length are handled by stretching RoPE (YaRN) in mid-training <small>· look in [[2026-11-11 - Training Paradigms II#A3 · Extend the context – 4,096 → 1,000,000|TP II §A3 Extend the context]]</small>
+- [ ] **C** The lack of long documents is fixed in the architecture, from the start <small>· look in [[2026-11-11 - Training Paradigms II#A3 · Extend the context – 4,096 → 1,000,000|TP II §A3 Extend the context]]</small>
+- [ ] **D** Olmo 3’s long-context stage has 50B tokens, about a third of them long documents <small>· look in [[2026-11-11 - Training Paradigms II#Long rows, at the end (Olmo 3)|TP II · Long rows, at the end]]</small>
+
+> [!success]- Answer: A, B, D
+> A ✓ · B ✓ · C ✗ · D ✓
+>
+> Attention: architecture, from the start. Positions and long data: mid-training. Olmo 3: 34 % long documents (8K–64K) + 66 % short mid-training mix.
+
+### P5 · SFT
+
+**What is true about supervised fine-tuning (SFT)?**
+
+- [ ] **A** It uses the ordinary next-token loss on (prompt, answer) pairs <small>· look in [[2026-11-11 - Training Paradigms II#B1 · SFT – examples to copy|TP II §B1 SFT]]</small>
+- [ ] **B** In rejection sampling the policy writes several answers and the best are kept <small>· look in [[2026-11-11 - Training Paradigms II#B1 · SFT – examples to copy|TP II §B1 SFT]]</small>
+- [ ] **C** It shows the model what a bad answer looks like <small>· look in [[2026-11-11 - Training Paradigms II#B1 · SFT – examples to copy|TP II §B1 SFT]]</small>
+- [ ] **D** In distillation, a weaker model writes the answers <small>· look in [[2026-11-11 - Training Paradigms II#B1 · SFT – examples to copy|TP II §B1 SFT]]</small>
+
+> [!success]- Answer: A, B
+> A ✓ · B ✓ · C ✗ · D ✗
+>
+> SFT only imitates. Answers come from people (curated), a stronger model (distillation) or the policy itself, filtered (rejection sampling).
+
+### P6 · four ways to cheaper attention
+
+**What does each new token look at in the cheaper attention variants?**
+
+- [ ] **A** Sliding window: only the last w tokens, so memory per new token is fixed <small>· look in [[2026-11-11 - Training Paradigms II#Excursus – attention cost and the KV cache|TP II · Excursus]]</small>
+- [ ] **B** Linear attention: a fixed-size state that summarises everything so far <small>· look in [[2026-11-11 - Training Paradigms II#Excursus – attention cost and the KV cache|TP II · Excursus]]</small>
+- [ ] **C** GQA and MLA: fewer earlier tokens, each kept at full size <small>· look in [[2026-11-11 - Training Paradigms II#Excursus – attention cost and the KV cache|TP II · Excursus]]</small>
+- [ ] **D** Sparse attention: a cheap look at compressed blocks, then full attention to a few selected ones <small>· look in [[2026-11-11 - Training Paradigms II#Excursus – attention cost and the KV cache|TP II · Excursus]]</small>
+
+> [!success]- Answer: A, B, D
+> A ✓ · B ✓ · C ✗ · D ✓
+>
+> GQA and MLA keep every token but make each one smaller in the cache. Frontier models mix several of these across layers.
+
+### P7 · properties of KL
+
+**KL = Σ p_policy (log p_policy − log p_ref). What is true?**
+
+- [ ] **A** It is 0 exactly when the two distributions are identical <small>· look in [[2026-11-11 - Training Paradigms II#B4 · RLHF – a reward model|TP II §B4 RLHF]]</small>
+- [ ] **B** It is never negative <small>· look in [[2026-11-11 - Training Paradigms II#B4 · RLHF – a reward model|TP II §B4 RLHF]]</small>
+- [ ] **C** KL(policy ‖ ref) always equals KL(ref ‖ policy) <small>· look in [[2026-11-11 - Training Paradigms II#B4 · RLHF – a reward model|TP II §B4 RLHF]]</small>
+- [ ] **D** For policy (0.80, 0.15, 0.05) vs reference (0.50, 0.30, 0.20) it is about 0.20 <small>· look in [[2026-11-11 - Training Paradigms II#B4 · RLHF – a reward model|TP II §B4 RLHF]]</small>
+
+> [!success]- Answer: A, B, D
+> A ✓ · B ✓ · C ✗ · D ✓
+>
+> 0.80 · 0.47 + 0.15 · (−0.69) + 0.05 · (−1.39) ≈ 0.20. KL is not symmetric.
+
+### P8 · PPO’s value model
+
+**In PPO for “Cows moo to call their calves”, what is true?**
+
+- [ ] **A** The return Gₜ adds up the rewards from token t to the end <small>· look in [[2026-11-11 - Training Paradigms II#B7 · PPO|TP II §B7 PPO]]</small>
+- [ ] **B** The value model is trained with (Vₜ − Gₜ)² <small>· look in [[2026-11-11 - Training Paradigms II#B7 · PPO|TP II §B7 PPO]]</small>
+- [ ] **C** Every token of the answer gets the same advantage <small>· look in [[2026-11-11 - Training Paradigms II#PPO vs GRPO|TP II · PPO vs GRPO]]</small>
+- [ ] **D** PPO keeps four models in memory: policy, reference, reward model, value model <small>· look in [[2026-11-11 - Training Paradigms II#PPO vs GRPO|TP II · PPO vs GRPO]]</small>
+
+> [!success]- Answer: A, B, D
+> A ✓ · B ✓ · C ✗ · D ✓
+>
+> Aₜ = Gₜ − Vₜ varies along the answer (+0.25 … +0.13 in the example). Same advantage for all tokens is GRPO.
 
 ---
 
@@ -352,210 +513,5 @@ Example: $r$ = 0.8, 0.5, 0.3, 0.1 → mean 0.425, std 0.259 → $A$ = **+1.45, +
 - RLVR needs a checkable answer.
 - Baseline: lets bad answers get pushed down; reduces variance; does not change what is optimal.
 - PPO = value model + per-token credit; GRPO = group mean/std, same advantage for all tokens, no value model, KL in the loss.
-
-
-## Test questions for this lecture (14)
-
-> [!info] Same format as the test
-> 0 to 4 options can be correct. Tick, then open the answer. **+1.5 ÷ n** per correct tick, **−0.75** per wrong tick, never below 0; no correct option → no tick = 1.5.
-> The same questions, mixed across lectures and timed, are in the mock tests ([[_GenAI Test 1 - Start Here|Start Here]]) and in the Quiz tab of the [[GenAI Lab]].
-
-### Official Q4 · the KV cache: prefill and decode
-<small>from [[GenAI - Official Example Questions|Official]]</small>
-
-**A model generates text one token at a time, with a standard KV cache. What happens for each new token?**
-
-- [ ] **A** Only the new token goes through all the layers
-- [ ] **B** Its query is compared with the cached keys of all earlier tokens
-- [ ] **C** Its key and value are stored in the cache for later tokens
-- [ ] **D** The keys of earlier tokens are updated to include the new token
-
-> [!success]- Answer: A, B, C
-> Earlier tokens are needed only inside attention, through their keys and values. Because of the mask, a token never sees later tokens, so its key and value never change.
-> *Training Paradigms II · the KV cache: prefill and decode*
-
-### Official Q6 · RLHF: over-optimization, KL, the loop
-<small>from [[GenAI - Official Example Questions|Official]]</small>
-
-**Why does RLHF penalize the policy with β · KL to the reference model?**
-
-- [ ] **A** It stops the policy from optimizing the reward model’s score too far
-- [ ] **B** It keeps the policy close to the SFT model it started from
-- [ ] **C** It keeps the reward model close to its weights from before RL
-- [ ] **D** It rewards the policy for tokens the reference model finds unlikely
-
-> [!success]- Answer: A, B
-> If the policy chases the reward model too far, its score keeps rising while the real quality goes up and then down. The KL term pulls the policy back towards the frozen SFT model, harder the further it moves. The reward model does not change during RL.
-> *Training Paradigms II · RLHF: over-optimization, KL, the loop*
-
-### Mock A Q13 · KV cache size
-<small>from [[GenAI - Mock Test A|Mock A]]</small>
-
-**Generation with a KV cache: 24 layers, 16 key/value heads of size 128, stored in bf16 (2 bytes). What is true?**
-
-- [ ] **A** Keeping 16 query heads but sharing each key/value head among 4 query heads makes the cache 4× smaller
-- [ ] **B** The prompt is processed one token at a time during prefill
-- [ ] **C** Decoding speed is limited mostly by reading weights and cache from memory
-- [ ] **D** The cache grows by 2 · 24 · 16 · 128 · 2 bytes (≈ 192 KiB) per token
-
-> [!success]- Answer: A, C, D
-> 2 for K and V × layers × KV heads × head size × bytes. GQA with 4 KV heads instead of 16 shrinks it 4×. Decoding reads all weights and the whole cache for each new token: memory-bound. Prefill reads the whole prompt in parallel.
-> *Training Paradigms II · KV cache size*
-
-### Mock A Q14 · DPO
-<small>from [[GenAI - Mock Test A|Mock A]]</small>
-
-**DPO with β = 0.1. Policy log-probabilities: chosen −38, rejected −37. Reference: chosen −40, rejected −35. What is true?**
-
-- [ ] **A** gain⁺ = (−38) − (−40) = +2
-- [ ] **B** Since the policy gives the rejected answer the higher log-probability, the loss is above log 2 ≈ 0.69
-- [ ] **C** DPO needs a separately trained reward model
-- [ ] **D** The loss is −log σ(0.4) ≈ 0.51
-
-> [!success]- Answer: A, D
-> gain⁻ = (−37) − (−35) = −2, so 0.1 · [2 − (−2)] = 0.4; σ(0.4) ≈ 0.60, −log 0.60 ≈ 0.51 < 0.69. DPO compares each answer with the frozen reference, not absolute log-probs. It needs no reward model and no sampling.
-> *Training Paradigms II · DPO*
-
-### Mock A Q15 · KL penalty
-<small>from [[GenAI - Mock Test A|Mock A]]</small>
-
-**In RLHF, the reward model gives an answer 0.8, the KL to the reference is 1.5, and β = 0.1. What is true?**
-
-- [ ] **A** The KL penalty makes the reward model more accurate
-- [ ] **B** The reward used for the update is 0.65
-- [ ] **C** If the policy were identical to the reference, the KL would be 0
-- [ ] **D** A larger β lets the policy drift further from the reference
-
-> [!success]- Answer: B, C
-> 0.8 − 0.1 · 1.5 = 0.65. KL = Σ p_policy (log p_policy − log p_ref) is 0 only for identical distributions. The reward model is frozen during RL; a larger β pulls harder towards the reference.
-> *Training Paradigms II · KL penalty*
-
-### Mock A Q16 · GRPO vs PPO
-<small>from [[GenAI - Mock Test A|Mock A]]</small>
-
-**GRPO samples 4 answers to one prompt, with rewards 0.8, 0.5, 0.3, 0.1 (mean 0.425, std 0.259). What is true?**
-
-- [ ] **A** The answer with reward 0.3 is pushed down, although its reward is positive
-- [ ] **B** Like PPO, GRPO trains a value model to compute the baseline
-- [ ] **C** The best answer’s advantage is about +1.45
-- [ ] **D** All tokens of the first answer get the same advantage
-
-> [!success]- Answer: A, C, D
-> A = (r − mean) / std: (0.8 − 0.425) / 0.259 ≈ +1.45; (0.3 − 0.425) / 0.259 ≈ −0.48 < 0. GRPO gives every token of an answer its A. The group mean is the baseline: no value model (PPO’s Vₜ).
-> *Training Paradigms II · GRPO vs PPO*
-
-### Mock B Q13 · mid-training
-<small>from [[GenAI - Mock Test B|Mock B]]</small>
-
-**What is part of mid-training?**
-
-- [ ] **A** Finishing on the best data, including maths and reasoning
-- [ ] **B** Extending the context to longer rows
-- [ ] **C** Adding thinking traces as chat conversations with user and assistant roles
-- [ ] **D** Cooling down the learning rate
-
-> [!success]- Answer: A, B, D
-> Mid-training: cool down, finish on the best data, extend the context. Thinking traces go in as plain text without chat format; the chat template comes with post-training.
-> *Training Paradigms II · mid-training*
-
-### Mock B Q14 · YaRN
-<small>from [[GenAI - Mock Test B|Mock B]]</small>
-
-**Olmo 3 7B (RoPE base 500,000) is extended from 8K to 64K with YaRN, scale 8. What is true?**
-
-- [ ] **A** Dividing every pair by 8 instead would blur the order of nearby tokens
-- [ ] **B** The fastest RoPE pairs are left unchanged
-- [ ] **C** The slowest pairs are slowed down by a factor of 8
-- [ ] **D** With YaRN, no training on long documents is needed
-
-> [!success]- Answer: A, B, C
-> Pair 1 turns 1,304 times in 8K: every angle seen, keep it. Pair 48 turns only 31°: beyond 8K it would reach unseen angles, so ÷8 maps 0–64K into the seen range. A long-context stage (64K rows) still follows.
-> *Training Paradigms II · YaRN*
-
-### Mock B Q15 · the baseline
-<small>from [[GenAI - Mock Test B|Mock B]]</small>
-
-**Four answers get rewards 0.8, 0.5, 0.3 and 0.1. Compare L = −r · Σ log p with L = −(r − b) · Σ log p, b = 0.425. What is true?**
-
-- [ ] **A** Without the baseline, all four answers are made more likely
-- [ ] **B** In PPO, the baseline is the value model’s prediction Vₜ
-- [ ] **C** The baseline changes which answer has the highest reward
-- [ ] **D** With the baseline, answers below the average are made less likely
-
-> [!success]- Answer: A, B, D
-> All rewards are positive, so −r · Σ log p pushes every answer up, the bad ones just less. r − b is negative for 0.3 and 0.1. Subtracting a constant does not reorder rewards. PPO: Aₜ = Gₜ − Vₜ; GRPO: the group mean.
-> *Training Paradigms II · the baseline*
-
-### Mock B Q16 · reward model
-<small>from [[GenAI - Mock Test B|Mock B]]</small>
-
-**A reward model is trained on people’s rankings of 4 answers to one prompt. What is true?**
-
-- [ ] **A** Each pair’s loss is −log σ(r⁺ − r⁻)
-- [ ] **B** During RL, the reward model keeps training alongside the policy
-- [ ] **C** The ranking gives 6 pairs of a better and a worse answer
-- [ ] **D** Only the difference between the two scores matters for the loss
-
-> [!success]- Answer: A, C, D
-> 4 choose 2 = 6. With r⁺ = 1.4 and r⁻ = −0.6: −log σ(2.0) ≈ 0.13. Adding a constant to both scores leaves the loss unchanged. During RL the reward model is frozen.
-> *Training Paradigms II · reward model*
-
-### Mock C Q13 · MLA and GQA
-<small>from [[GenAI - Mock Test C|Mock C]]</small>
-
-**What is true about grouped-query attention (GQA) and multi-head latent attention (MLA)?**
-
-- [ ] **A** Both make the KV cache smaller
-- [ ] **B** In GQA several query heads share one key/value head
-- [ ] **C** MLA caches a small latent per token (512 numbers in DeepSeek-V3) instead of full keys and values
-- [ ] **D** In MLA, W^UK can be folded into the query, so the full keys need not be built
-
-> [!success]- Answer: A, B, C, D
-> MLA: C = X W^DKV (7,168 → 512); K = C W^UK and V = C W^UV (512 → 16,384). qₜkⱼᵀ = (qₜ W^UKᵀ) cⱼᵀ. 512 vs 2 · 16,384: 64× less cache.
-> *Training Paradigms II · MLA and GQA*
-
-### Mock C Q14 · packing long rows
-<small>from [[GenAI - Mock Test C|Mock C]]</small>
-
-**In the long-context stage, a 64K row packs a 30K PDF together with several short documents. What is true?**
-
-- [ ] **A** Intra-document masking is what lets the PDF be seen in one piece
-- [ ] **B** Intra-document masking puts −∞ between tokens of different documents
-- [ ] **C** Without extra masking, tokens of a later short document could attend to the PDF
-- [ ] **D** With intra-document masking, the <|endoftext|> separators are no longer needed
-
-> [!success]- Answer: B, C
-> The causal mask alone lets every token see everything before it in the row. Intra-document masking blocks attention across documents. The PDF fits in one piece because the rows are 64K long; the separators still mark where documents end.
-> *Training Paradigms II · packing long rows*
-
-### Mock C Q15 · on-policy distillation
-<small>from [[GenAI - Mock Test C|Mock C]]</small>
-
-**On-policy distillation: for three tokens of the student’s answer, the student gives p = 0.60, 0.90, 0.30 and the teacher p = 0.70, 0.90, 0.02. What is true?**
-
-- [ ] **A** The grades are held fixed, like rewards
-- [ ] **B** The teacher writes the answer and the student copies it
-- [ ] **C** The first token’s grade is about +0.15
-- [ ] **D** The third token is pushed down
-
-> [!success]- Answer: A, C, D
-> grade = log p_teacher − log p_student: log(0.7/0.6) ≈ +0.15, 0, log(0.02/0.3) ≈ −2.71. The student writes (on-policy); the teacher only scores, in one forward pass.
-> *Training Paradigms II · on-policy distillation*
-
-### Mock C Q16 · RLVR
-<small>from [[GenAI - Mock Test C|Mock C]]</small>
-
-**Which of these tasks can be trained with RLVR, i.e. with a program that checks the answer and returns 1 or 0?**
-
-- [ ] **A** Summarise this article
-- [ ] **B** Comfort a sad friend
-- [ ] **C** Write a poem about cows
-- [ ] **D** Decide whether this joke is funny
-
-> [!success]- Answer: none (no tick = full points)
-> None: there is no program that can check any of these. They need RLHF or RLAIF (a reward model or a judge). RLVR fits maths answers, unit tests, checkable constraints, generated puzzles, valid JSON or tool calls.
-> *Training Paradigms II · RLVR*
-
-<!-- end of test questions -->
 
 Related: [[GenAI - Glossary|Glossary: symbols & variables]] · [[2026-11-04 - Training Paradigms I|Training Paradigms I]] · [[2026-11-18 - Applied Generative AI I|Applied Generative AI I]] · [[GenAI Lab]]

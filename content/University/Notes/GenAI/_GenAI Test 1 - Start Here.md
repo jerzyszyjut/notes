@@ -34,33 +34,38 @@ Reference: [[GenAI - Glossary|Glossary: symbols & variables]] (every letter in e
 
 ## Practice
 
-- **Start with** [[GenAI - Official Example Questions|the 7 official example questions]]: the course's own sheet, ticks as published.
-- [[GenAI - Mock Test A|Mock Test A]] · [[GenAI - Mock Test B|Mock Test B]] · [[GenAI - Mock Test C|Mock Test C]]: 20 questions each, same format and difficulty as the example sheet, spread over all five lectures.
-- [[GenAI - Extra Questions|Extra Questions]]: 16 more, by topic.
-- The same 76 questions, with automatic scoring and a timer: Quiz tab in [[GenAI Lab]].
+Two separate pools, so the mock tests stay fresh:
+
+| Pool | Where | Questions |
+|---|---|---|
+| **Practice by lecture** | at the end of each lecture note, before “Exam traps” | 8 per lecture = 40 (incl. the 7 official ones) |
+| **Mock tests** | [[GenAI - Mock Test A\|Mock A]] · [[GenAI - Mock Test B\|Mock B]] · [[GenAI - Mock Test C\|Mock C]] · [[GenAI - Mock Test D\|Mock D]] | 4 × 20, all lectures mixed, 40 minutes each; not in the notes |
+| Official sheet | [[GenAI - Official Example Questions]] | the course's 7 questions, ticks as published |
+
+Every option (A–D) links to the section of the notes that answers it: treat each option as its own true/false question. All 120 questions are also in the Quiz of the [[GenAI Lab]], with scoring and a timer.
 
 ## How this folder is built
 
 | What | Where |
 |---|---|
-| Lecture notes | `2026-MM-DD - <lecture>.md`, sorted by date; each section ends with the **lecture slides** that belong to it (open callouts) and, where there is one, the matching **lab tab** embedded live |
+| Lecture notes | `2026-MM-DD - <lecture>.md`, sorted by date; each section ends with its **lecture slides** (collapsed, click to open) and, where there is one, the matching **interactive tool** (one tool per frame); practice questions at the end |
 | Slide pictures | `attachments/GenAI-L<lecture>-slajd<NN>.png` (L1 = Intro … L5 = Applied; NN = page in the lecture PDF) |
 | Interactive lab | `attachments/genai-lab.htm`, shown in [[GenAI Lab]] and inside the notes |
-| Tests | `Practice/`: official sheet, Mock Tests A–C, Extra Questions |
+| Tests | `Practice/`: Mock Tests A–D, official sheet |
 | Website | every note has `publish: true`; run `pn` to publish (Quartz copies the slides and the lab with the notes) |
 
 > [!note] Embedded pages
-> The 5w1h pages and the lab are `<iframe>`s. They need internet, inside Obsidian too. The lab frames load the **published** copy, so they show up only after the first `pn`.
+> The 5w1h pages and the lab are `<iframe>`s. They need internet, inside Obsidian too. The tool frames load the **published** lab (`genai-lab.htm?tool=…`), so changes show up after `pn`.
 
 ## Suggested plan (Fri 20 → Wed 25 Nov)
 
 | Day | Do |
 |---|---|
-| Fri 20 | Intro + LM notes with the 5w1h pages open; Attention, RoPE and LayerNorm tabs in the lab. **Mock Test A.** |
-| Sat 21 | Training Paradigms I note + Compute tab; redo the 6ND / Chinchilla / vocab numbers by hand. |
-| Sun 22 | Training Paradigms II note; KV cache, DPO · RM · KL, PPO · GRPO tabs. **Mock Test B.** |
-| Mon 23 | Applied note + Applied tab. Formula Sheet from memory. |
-| Tue 24 | **Mock Test C** under time (40 min), then Extra Questions on your weakest lecture; reread the "Exam traps" boxes at the end of each note. |
+| Fri 20 | Intro + LM notes with their practice questions; try the attention, RoPE and LayerNorm tools. **Mock Test A.** |
+| Sat 21 | Training Paradigms I note + practice; redo the 6ND / Chinchilla / vocab numbers by hand. **Mock Test B.** |
+| Sun 22 | Training Paradigms II note + practice; KV cache, DPO, KL, PPO, GRPO tools. **Mock Test C.** |
+| Mon 23 | Applied note + practice. Formula Sheet from memory. |
+| Tue 24 | **Mock Test D** under time (40 min); for every wrong option open its linked section; reread the "Exam traps" boxes. |
 
 ## The whole course so far, in one chain
 

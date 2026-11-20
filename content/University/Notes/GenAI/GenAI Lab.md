@@ -6,27 +6,37 @@ course: Generative AI (194.207)
 
 # GenAI Lab (interactive)
 
-One page with live versions of the formulas, for the topics the 5w1h pages don't make interactive, plus all 76 practice questions with the real test's scoring.
+Live versions of the formulas, one tool at a time, and a quiz with all 120 practice questions scored like the real test.
 
-<iframe src="https://jerzyszyjut.github.io/notes/university/notes/genai/genai-lab.htm#quiz" width="100%" height="900" style="border:1px solid #8884; border-radius:8px;"></iframe>
+## Quiz
 
-*[[genai-lab.htm|Open the lab full screen]]*
+<iframe src="https://jerzyszyjut.github.io/notes/university/notes/genai/genai-lab.htm?tool=quiz" width="100%" height="900" style="border:1px solid #8884; border-radius:8px;"></iframe>
 
-| Tab | What you can play with | Used in |
+Sets: Mock Tests A–D, the practice questions from the notes, or all 120 shuffled; filter by lecture. Every option has a ↗ link to the section of the notes that answers it.
+
+---
+
+## The tools
+
+Each tool is also embedded next to its theory in the lecture notes. Address: `genai-lab.htm?tool=<id>`.
+
+| Tool | id | In the notes |
 |---|---|---|
-| **Quiz** | Mock Tests A/B/C, Extra questions, or all 76 shuffled; filter by lecture; scored like the test (+1.5/n, −0.75, floor 0) with a 2-minutes-per-question clock | [[_GenAI Test 1 - Start Here\|Start Here]] |
-| **Attention** | one row of scores → scale by √dₖ → causal mask → softmax; switch scaling off at large dₖ and watch it go one-hot | [[2026-10-28 - Theoretical Foundations of Language Modelling\|LM]] |
-| **RoPE & YaRN** | angle dials per pair for any position and base; YaRN table of turns per pair and the resulting slow-down | [[2026-10-28 - Theoretical Foundations of Language Modelling\|LM]], [[2026-11-11 - Training Paradigms II\|TP II]] |
-| **LayerNorm** | μ, σ, γ, β on a six-number vector; RMSNorm switch | [[2026-10-28 - Theoretical Foundations of Language Modelling\|LM]] |
-| **Compute** | H100-hours × MFU → C; 6ND; Chinchilla N = √(C/120); vocab share 2Vd; d ÷ blocks | [[2026-11-04 - Training Paradigms I\|TP I]] |
-| **KV cache** | bytes per token and per context; GQA and MLA savings | [[2026-11-11 - Training Paradigms II\|TP II]] |
-| **DPO · RM · KL** | DPO loss from four log-probs; Bradley–Terry loss; KL between two distributions; on-policy distillation grades | [[2026-11-11 - Training Paradigms II\|TP II]] |
-| **PPO · GRPO** | group advantages; ratio and clip; the PPO return/value/advantage table | [[2026-11-11 - Training Paradigms II\|TP II]] |
-| **Applied** | pass@k vs pass^k chart; Elo; memory and tokens/s; request cost with caching | [[2026-11-18 - Applied Generative AI I\|Applied]] |
-
-Each tab can be opened directly: add `#quiz`, `#attention`, `#rope`, `#layernorm`, `#compute`, `#kvcache`, `#post`, `#rl` or `#applied` to the address. The lecture notes embed the matching tab right next to the theory.
+| Attention row: √dₖ, mask, softmax | `attention` | [[2026-10-28 - Theoretical Foundations of Language Modelling#Why divide by √dₖ?\|LM · Why divide by √dₖ?]] |
+| RoPE dials | `rope` | [[2026-10-28 - Theoretical Foundations of Language Modelling#RoPE in detail\|LM · RoPE in detail]] |
+| LayerNorm on one vector | `layernorm` | [[2026-10-28 - Theoretical Foundations of Language Modelling#5 · Add & Norm – keeping it trainable\|LM §5 Add & Norm]] |
+| Compute budget C ≈ 6·N·D | `compute` | [[2026-11-04 - Training Paradigms I#1.4 The pilot's numbers, step by step\|TP I §1.4]] |
+| KV cache size, GQA, MLA | `kvcache` | [[2026-11-11 - Training Paradigms II#Excursus – attention cost and the KV cache\|TP II · Excursus]] |
+| YaRN | `yarn` | [[2026-11-11 - Training Paradigms II#Stretching the positions – YaRN\|TP II · YaRN]] |
+| DPO loss | `dpo` | [[2026-11-11 - Training Paradigms II#B2 · DPO – pairs, one better\|TP II §B2]] |
+| On-policy distillation grades | `distill` | [[2026-11-11 - Training Paradigms II#B3 · On-policy distillation – a teacher, token by token\|TP II §B3]] |
+| Reward model loss, KL | `rm`, `kl` | [[2026-11-11 - Training Paradigms II#B4 · RLHF – a reward model\|TP II §B4]] |
+| PPO ratio, clip, returns | `ppo` | [[2026-11-11 - Training Paradigms II#B7 · PPO\|TP II §B7]] |
+| GRPO advantages | `grpo` | [[2026-11-11 - Training Paradigms II#B8 · GRPO (DeepSeekMath)\|TP II §B8]] |
+| Elo | `elo` | [[2026-11-18 - Applied Generative AI I#Elo (Arena)\|Applied · Elo]] |
+| Memory and tokens/s | `memory` | [[2026-11-18 - Applied Generative AI I#Running a model locally\|Applied · Running locally]] |
+| Request cost | `cost` | [[2026-11-18 - Applied Generative AI I#Station 7 · Stream back\|Applied · Station 7]] |
+| pass@k vs pass^k | `passk` | [[2026-11-18 - Applied Generative AI I#pass@k vs passᵏ\|Applied · pass@k]] |
 
 > [!info] Where the lab lives
-> - The page is the file `attachments/genai-lab.htm` in this folder. `pn` publishes it next to the notes, and every embedded frame loads it from the published site, so the frames work on the site **and** inside Obsidian (online).
-> - Offline: click *open the lab full screen* (opens the local file in the browser).
-> - The quiz has no extra questions beyond the 76 from the mock tests; the 7 official example questions are in [[GenAI - Official Example Questions]].
+> The page is `attachments/genai-lab.htm` in this folder ([[genai-lab.htm|open the whole lab]]). `pn` publishes it, and every frame loads the published copy, so the frames work on the site and in Obsidian (online).
